@@ -21,10 +21,10 @@ impl UserData for SCREEN {
             scene.update(Update::SetScreenColor(
                 this.id,
                 Color {
-                    r: 0,
-                    g: 0,
-                    b: 0,
-                    a: 255,
+                    r: 0.0,
+                    g: 0.0,
+                    b: 0.0,
+                    a: 0.0,
                 },
             ));
             scene.update(Update::TransitionScreenColor(

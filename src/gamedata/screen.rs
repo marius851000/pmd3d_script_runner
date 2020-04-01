@@ -52,18 +52,10 @@ impl Screen {
             } else {
                 let proportion = elapsed_second / duration_second;
                 self.actual_color = Color {
-                    r: (transition.initial_color.r as f64
-                        + (transition.final_color.r as f64 - transition.initial_color.r as f64)
-                            * proportion) as u8,
-                    g: (transition.initial_color.g as f64
-                        + (transition.final_color.g as f64 - transition.initial_color.g as f64)
-                            * proportion) as u8,
-                    b: (transition.initial_color.b as f64
-                        + (transition.final_color.b as f64 - transition.initial_color.b as f64)
-                            * proportion) as u8,
-                    a: (transition.initial_color.a as f64
-                        + (transition.final_color.a as f64 - transition.initial_color.a as f64)
-                            * proportion) as u8,
+                    r: transition.initial_color.r + (transition.final_color.r - transition.initial_color.r) * proportion,
+                    g: transition.initial_color.g + (transition.final_color.g - transition.initial_color.g) * proportion,
+                    b: transition.initial_color.b + (transition.final_color.b - transition.initial_color.b) * proportion,
+                    a: transition.initial_color.a + (transition.final_color.a - transition.initial_color.a) * proportion,
                 };
                 still_need_update = true;
             };

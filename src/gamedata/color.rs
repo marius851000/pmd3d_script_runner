@@ -1,9 +1,9 @@
 #[derive(Debug, Clone, PartialEq)]
 pub struct Color {
-    pub r: u8,
-    pub g: u8,
-    pub b: u8,
-    pub a: u8,
+    pub r: f64,
+    pub g: f64,
+    pub b: f64,
+    pub a: f64,
 }
 
 impl Default for Color {
@@ -15,19 +15,19 @@ impl Default for Color {
 impl Color {
     pub fn transparent() -> Self {
         Self {
-            r: 0,
-            g: 0,
-            b: 0,
-            a: 255,
+            r: 0.0,
+            g: 0.0,
+            b: 0.0,
+            a: 0.0,
         }
     }
 
     pub fn black() -> Self {
         Self {
-            r: 0,
-            g: 0,
-            b: 0,
-            a: 0,
+            r: 0.0,
+            g: 0.0,
+            b: 0.0,
+            a: 1.0,
         }
     }
 }
