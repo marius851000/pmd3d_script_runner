@@ -8,7 +8,7 @@ pub enum Update {
     /// id, actor
     AddChara(String, String),
     /// id, position
-    SetPosition(String, Vec3<f32>),
+    SetPosition(String, Vec3<f64>),
     /// Lock
     AddLock(Lock),
     /// time spent

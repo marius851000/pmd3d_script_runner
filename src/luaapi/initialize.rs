@@ -73,7 +73,7 @@ pub fn initialize_lua_environment(lua: &RunningLua, scene: &Arc<Mutex<Scene>>) {
         globals.set("CH", CH_function).unwrap();
         // add Vector
         let Vector_function = ctx
-            .create_function(|_, (x, y, z): (f32, f32, f32)| Ok(Vec3::new(x, y, z)))
+            .create_function(|_, (x, y, z): (f64, f64, f64)| Ok(Vec3::new(x, y, z)))
             .unwrap();
         globals.set("Vector", Vector_function).unwrap();
         // add TimeSec

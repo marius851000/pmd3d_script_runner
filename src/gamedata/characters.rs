@@ -2,7 +2,7 @@ use crate::gamedata::Vec3;
 
 #[derive(Debug)]
 pub struct Chara {
-    position: Vec3<f32>,
+    pub position: Vec3<f64>,
     _actor: String, //TODO: change with another data structure
 }
 
@@ -14,7 +14,7 @@ impl Chara {
         }
     }
 
-    pub fn set_position(&mut self, position: Vec3<f32>) {
+    pub fn set_position(&mut self, position: Vec3<f64>) {
         self.position = position;
     }
 }

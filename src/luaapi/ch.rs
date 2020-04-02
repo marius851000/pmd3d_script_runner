@@ -14,7 +14,7 @@ impl CH {
 }
 impl UserData for CH {
     fn add_methods<'lua, M: UserDataMethods<'lua, Self>>(methods: &mut M) {
-        methods.add_method("SetPosition", |_, this, position: Vec3<f32>| {
+        methods.add_method("SetPosition", |_, this, position: Vec3<f64>| {
             let mut scene = this.scene.lock().unwrap();
             scene.update(Update::SetPosition(this.id.clone(), position));
             Ok(())
