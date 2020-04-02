@@ -3,11 +3,12 @@ use std::collections::HashMap;
 use std::mem::swap;
 use std::sync::atomic::Ordering::Relaxed;
 
+#[derive(Debug)]
 pub struct Scene {
-    charas: HashMap<String, Chara>,
+    pub charas: HashMap<String, Chara>,
     updates: Vec<Update>,
     locks: Vec<Lock>,
-    screens: Vec<Screen>, //Screen 0: upper, Screen 1: down
+    pub screens: Vec<Screen>, //Screen 0: upper, Screen 1: down
 }
 
 impl Default for Scene {

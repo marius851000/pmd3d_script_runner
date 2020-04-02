@@ -1,15 +1,15 @@
-use pmd3d_script_runner::Input;
-use pmd3d_script_runner::Logic;
+use pmd3d_script_runner::PistonRenderer;
 
 fn main() {
-    let mut logic = Logic::new(
+    let mut renderer = PistonRenderer::new();
+    renderer.load(
         r#"
-        --<fade to black>--
-SCREEN_A:FadeOut(TimeSec(1), true)
+CHARA:DynamicLoad("HERO", "KIBAGO")
+CHARA:DynamicLoad("PARTNER", "TSUTAAJA")
+CH("HERO"):SetPosition(Vector(8, 0, -1))
+CH("PARTNER"):SetPosition(Vector(8, 0, 0))
 "#,
     );
-    for _ in 0..15 {
-        logic.execute(Input::new(0.1));
-        println!("{:?}", logic.get_and_clear_updates());
-    }
+    renderer.run();
+    renderer.close();
 }

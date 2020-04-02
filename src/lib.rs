@@ -15,3 +15,6 @@ pub use input::Input;
 
 mod transform_script;
 pub use transform_script::transform_script;
+
+mod render;
+pub use render::PistonRenderer;

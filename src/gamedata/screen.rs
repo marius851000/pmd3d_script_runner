@@ -1,5 +1,6 @@
 use crate::gamedata::{Color, Time};
 
+#[derive(Debug)]
 struct ColorTransition {
     elapsed_time: Time,
     duration: Time,
@@ -7,9 +8,10 @@ struct ColorTransition {
     final_color: Color,
 }
 
+#[derive(Debug)]
 pub struct Screen {
     need_update: bool,
-    actual_color: Color,
+    pub actual_color: Color,
     ongoing_transition: Option<ColorTransition>,
 }
 
@@ -50,12 +52,16 @@ impl Screen {
                 self.actual_color = transition.final_color.clone();
                 self.ongoing_transition = None;
             } else {
-                let proportion = elapsed_second / duration_second;
+                let proportion = (elapsed_second / duration_second) as f32;
                 self.actual_color = Color {
-                    r: transition.initial_color.r + (transition.final_color.r - transition.initial_color.r) * proportion,
-                    g: transition.initial_color.g + (transition.final_color.g - transition.initial_color.g) * proportion,
-                    b: transition.initial_color.b + (transition.final_color.b - transition.initial_color.b) * proportion,
-                    a: transition.initial_color.a + (transition.final_color.a - transition.initial_color.a) * proportion,
+                    r: transition.initial_color.r
+                        + (transition.final_color.r - transition.initial_color.r) * proportion,
+                    g: transition.initial_color.g
+                        + (transition.final_color.g - transition.initial_color.g) * proportion,
+                    b: transition.initial_color.b
+                        + (transition.final_color.b - transition.initial_color.b) * proportion,
+                    a: transition.initial_color.a
+                        + (transition.final_color.a - transition.initial_color.a) * proportion,
                 };
                 still_need_update = true;
             };

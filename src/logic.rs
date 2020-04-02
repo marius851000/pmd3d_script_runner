@@ -5,9 +5,10 @@ use crate::Input;
 use crate::RunningLua;
 use std::sync::{Arc, Mutex};
 
+#[derive(Debug)]
 pub struct Logic {
     lua: RunningLua,
-    scene: Arc<Mutex<Scene>>,
+    pub scene: Arc<Mutex<Scene>>,
 }
 
 impl Logic {

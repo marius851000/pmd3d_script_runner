@@ -46,7 +46,7 @@ impl YieldResult {
 
 impl UserData for YieldResult {}
 
-#[derive(Default)]
+#[derive(Default, Debug)]
 struct LuaRunningData {
     next_task_id: u64,
     task_look_list: HashMap<u64, LockReason>,
@@ -92,6 +92,14 @@ impl LuaRunningData {
 pub struct RunningLua {
     lua: Lua,
     running_data: Arc<Mutex<LuaRunningData>>,
+}
+
+impl std::fmt::Debug for RunningLua {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("RunningLua")
+            .field("running_data", &self.running_data)
+            .finish()
+    }
 }
 
 impl Default for RunningLua {

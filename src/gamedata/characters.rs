@@ -1,7 +1,6 @@
 use crate::gamedata::Vec3;
 
-//NOTE: all change on chara should be done throught Scene via update
-
+#[derive(Debug)]
 pub struct Chara {
     position: Vec3<f32>,
     _actor: String, //TODO: change with another data structure
