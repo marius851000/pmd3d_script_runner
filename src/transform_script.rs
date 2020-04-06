@@ -11,12 +11,10 @@ pub fn transform_script(script: &str) -> String {
             let mut temp = String::new();
             for chara in code.chars() {
                 temp.push(chara);
-                if !contain_equal {
-                    if chara == '=' {
-                        contain_equal = true;
-                        everytime_before = temp;
-                        temp = String::new();
-                    };
+                if !contain_equal && chara == '=' {
+                    contain_equal = true;
+                    everytime_before = temp;
+                    temp = String::new();
                 }
             }
             // push whitespace and tabulation in everytime_before

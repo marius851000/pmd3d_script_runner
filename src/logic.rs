@@ -17,7 +17,7 @@ impl Logic {
         let scene = Arc::new(Mutex::new(Scene::default()));
         initialize_lua_environment(&lua, &scene);
         lua.load_script(&transform_script(script));
-        Logic { lua, scene: scene }
+        Logic { lua, scene }
     }
 
     pub fn execute(&mut self, input: Input) {

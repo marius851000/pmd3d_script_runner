@@ -22,7 +22,6 @@ pub struct Camera {
     angle: f64, // radians
 }
 
-
 impl Camera {
     pub fn new(scale: f64, (x_unit, y_unit): (f64, f64), angle: f64) -> Self {
         Self {
@@ -33,7 +32,7 @@ impl Camera {
             y_pixel: y_unit * scale,
             x_pixel_screen_center: 0.0,
             y_pixel_screen_center: 0.0,
-            angle
+            angle,
         }
     }
 
@@ -49,8 +48,7 @@ impl Camera {
     }
 
     pub fn set_screen_size(&mut self, (x_pixel, y_pixel): (f64, f64)) {
-        self.x_pixel_screen_center = x_pixel/2.0;
-        self.y_pixel_screen_center = y_pixel/2.0;
+        self.x_pixel_screen_center = x_pixel / 2.0;
+        self.y_pixel_screen_center = y_pixel / 2.0;
     }
-
 }

@@ -11,7 +11,7 @@ impl Time {
     }
 
     /// Return the time contained by this structure, in second
-    pub fn get_time(&self) -> f64 {
+    pub fn get_time(self) -> f64 {
         self.0
     }
 

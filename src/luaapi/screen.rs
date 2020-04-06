@@ -29,7 +29,7 @@ impl UserData for SCREEN {
             ));
             scene.update(Update::TransitionScreenColor(
                 this.id,
-                duration.clone(),
+                duration,
                 Color::black(),
             ));
             if sleep {

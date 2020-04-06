@@ -1,4 +1,5 @@
 //! This file contain everything required to make cooperative multiprocessing lua reader implementation
+#![allow(clippy::trivially_copy_pass_by_ref)]
 use rlua::{Context, Function, Lua, Nil, Table, Thread, ThreadStatus, UserData};
 use std::collections::HashMap;
 use std::sync::{
@@ -26,7 +27,7 @@ impl LockReason {
     pub fn can_continue(&self) -> bool {
         match self {
             Self::None => true,
-            Self::WaitAtomicBool(value) => return value.load(Relaxed),
+            Self::WaitAtomicBool(value) => value.load(Relaxed),
         }
     }
 }

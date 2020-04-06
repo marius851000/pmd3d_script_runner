@@ -16,6 +16,7 @@ pub struct Screen {
 }
 
 impl Screen {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Screen {
         Screen {
             need_update: false,
@@ -38,14 +39,14 @@ impl Screen {
         })
     }
 
-    pub fn time_spent(&mut self, time: &Time) {
+    pub fn time_spent(&mut self, time: Time) {
         if !self.need_update {
             return;
         };
         let mut still_need_update = false;
 
         if let Some(transition) = &mut self.ongoing_transition {
-            transition.elapsed_time += *time;
+            transition.elapsed_time += time;
             let elapsed_second = transition.elapsed_time.get_time();
             let duration_second = transition.duration.get_time();
             if elapsed_second >= duration_second {

@@ -7,7 +7,7 @@ mod update;
 pub use update::Update;
 
 mod vectors;
-pub use vectors::{Vec3_f64, Vec2_f64};
+pub use vectors::{Vec2_f64, Vec3_f64};
 
 mod characters;
 pub use characters::Chara;

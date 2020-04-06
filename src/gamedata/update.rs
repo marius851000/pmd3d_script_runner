@@ -1,4 +1,4 @@
-use crate::gamedata::{Color, Lock, Time, Vec3_f64, Vec2_f64, Speed};
+use crate::gamedata::{Color, Lock, Speed, Time, Vec2_f64, Vec3_f64};
 
 /// This enum store everything that can update the scene
 #[derive(Debug, Clone)]

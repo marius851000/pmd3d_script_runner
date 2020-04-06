@@ -1,4 +1,5 @@
-use crate::gamedata::{Scene, Time, Vec3_f64, Vec2_f64, Speed};
+#![allow(clippy::trivially_copy_pass_by_ref)]
+use crate::gamedata::{Scene, Speed, Time, Vec2_f64, Vec3_f64};
 use crate::luaapi::{CH, CHARA, SCREEN, TASK};
 use crate::RunningLua;
 use rlua::Context;

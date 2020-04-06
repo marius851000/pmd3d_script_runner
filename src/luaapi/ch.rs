@@ -1,4 +1,4 @@
-use crate::gamedata::{Scene, Update, Vec3_f64, Vec2_f64, Speed};
+use crate::gamedata::{Scene, Speed, Update, Vec2_f64, Vec3_f64};
 use rlua::{UserData, UserDataMethods};
 use std::sync::{Arc, Mutex};
 

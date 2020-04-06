@@ -45,10 +45,13 @@ impl Scene {
                     .get_mut(id)
                     .unwrap()
                     .set_position(position.clone());
-            },
+            }
             Update::WalkTo(id, position, speed) => {
-                self.charas.get_mut(id).unwrap().walk_to(position.clone(), speed.clone());
-            },
+                self.charas
+                    .get_mut(id)
+                    .unwrap()
+                    .walk_to(position.clone(), speed.clone());
+            }
             Update::AddLock(lock) => self.locks.push(lock.clone()),
             Update::TimeSpent(time) => {
                 self.locks.drain_filter(|lock| match lock {
@@ -65,10 +68,10 @@ impl Scene {
                     _ => false,
                 });
                 for screen in &mut self.screens {
-                    screen.time_spent(&time);
+                    screen.time_spent(*time);
                 }
-                for (_charid, chara) in &mut self.charas {
-                    chara.time_spent(&time);
+                for chara in self.charas.values_mut() {
+                    chara.time_spent(*time);
                 }
             }
             Update::SetScreenColor(screen_id, color) => {

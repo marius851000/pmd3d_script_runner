@@ -1,4 +1,4 @@
-use crate::gamedata::{Vec3_f64, Vec2_f64, Speed, Time};
+use crate::gamedata::{Speed, Time, Vec2_f64, Vec3_f64};
 
 #[derive(Debug)]
 struct WalkTo {
@@ -9,7 +9,7 @@ struct WalkTo {
 #[derive(Debug)]
 enum OngoingMovement {
     None,
-    WalkTo(WalkTo)
+    WalkTo(WalkTo),
 }
 
 #[derive(Debug)]
@@ -46,13 +46,10 @@ impl Chara {
 
     pub fn walk_to(&mut self, destination: Vec2_f64, speed: Speed) {
         self.abort_ongoing_movement();
-        self.ongoing_movement = OngoingMovement::WalkTo(WalkTo {
-            destination,
-            speed,
-        })
+        self.ongoing_movement = OngoingMovement::WalkTo(WalkTo { destination, speed })
     }
 
-    pub fn time_spent(&mut self, time: &Time) {
+    pub fn time_spent(&mut self, time: Time) {
         let moved = match &self.ongoing_movement {
             OngoingMovement::None => false,
             OngoingMovement::WalkTo(walk_to) => {
@@ -61,16 +58,20 @@ impl Chara {
                 let distance_able_to_walk = walk_to.speed.0 * time.0;
                 let (walked_to, finished) = if distance_able_to_walk < distance_to_target {
                     let vector = (walk_to.destination - self.position.to_vec2()).normalize();
-                    (self.position.to_vec2() + Vec2_f64 {
-                        x: vector.x * distance_able_to_walk,
-                        y: vector.y * distance_able_to_walk,
-                    }, true)
+                    (
+                        self.position.to_vec2()
+                            + Vec2_f64 {
+                                x: vector.x * distance_able_to_walk,
+                                y: vector.y * distance_able_to_walk,
+                            },
+                        true,
+                    )
                 } else {
                     (walk_to.destination, false)
                 };
                 self.position = walked_to.to_vec3(0.0);
                 finished
-            },
+            }
         };
         if !moved {
             self.ongoing_movement = OngoingMovement::None;

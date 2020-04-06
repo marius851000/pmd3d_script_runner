@@ -9,12 +9,9 @@ pub struct Vec3_f64 {
     pub z: f64,
 }
 
-impl UserData for Vec3_f64
-{
-}
+impl UserData for Vec3_f64 {}
 
-impl Vec3_f64
-{
+impl Vec3_f64 {
     pub fn new(x: f64, y: f64, z: f64) -> Self {
         Self { x, y, z }
     }
@@ -27,8 +24,7 @@ impl Vec3_f64
     }
 }
 
-impl Add for Vec3_f64
-{
+impl Add for Vec3_f64 {
     type Output = Self;
     fn add(self, other: Self) -> Self {
         Self {
@@ -39,8 +35,7 @@ impl Add for Vec3_f64
     }
 }
 
-impl Sub for Vec3_f64
-{
+impl Sub for Vec3_f64 {
     type Output = Self;
     fn sub(self, other: Self) -> Self {
         Self {
@@ -51,8 +46,7 @@ impl Sub for Vec3_f64
     }
 }
 
-impl Div for Vec3_f64
-{
+impl Div for Vec3_f64 {
     type Output = Self;
     fn div(self, other: Self) -> Self {
         Self {
@@ -63,8 +57,7 @@ impl Div for Vec3_f64
     }
 }
 
-impl Mul for Vec3_f64
-{
+impl Mul for Vec3_f64 {
     type Output = Self;
     fn mul(self, other: Self) -> Self {
         Self {
@@ -92,14 +85,11 @@ pub struct Vec2_f64 {
     pub y: f64,
 }
 
-impl UserData for Vec2_f64
-{
-}
+impl UserData for Vec2_f64 {}
 
-impl Vec2_f64
-{
+impl Vec2_f64 {
     pub fn distance(&self, other: &Vec2_f64) -> f64 {
-        ((self.x-other.x).powi(2)+(self.y-other.y).powi(2)).sqrt()
+        ((self.x - other.x).powi(2) + (self.y - other.y).powi(2)).sqrt()
     }
 
     pub fn normalize(&self) -> Vec2_f64 {
@@ -114,20 +104,18 @@ impl Vec2_f64
         Vec3_f64 {
             x: self.x,
             y: self.y,
-            z
+            z,
         }
     }
 }
 
-impl Vec2_f64
-{
+impl Vec2_f64 {
     pub fn new(x: f64, y: f64) -> Self {
         Self { x, y }
     }
 }
 
-impl Add for Vec2_f64
-{
+impl Add for Vec2_f64 {
     type Output = Self;
     fn add(self, other: Self) -> Self {
         Self {
@@ -137,8 +125,7 @@ impl Add for Vec2_f64
     }
 }
 
-impl Sub for Vec2_f64
-{
+impl Sub for Vec2_f64 {
     type Output = Self;
     fn sub(self, other: Self) -> Self {
         Self {
@@ -148,8 +135,7 @@ impl Sub for Vec2_f64
     }
 }
 
-impl Div for Vec2_f64
-{
+impl Div for Vec2_f64 {
     type Output = Self;
     fn div(self, other: Self) -> Self {
         Self {
@@ -159,8 +145,7 @@ impl Div for Vec2_f64
     }
 }
 
-impl Mul for Vec2_f64
-{
+impl Mul for Vec2_f64 {
     type Output = Self;
     fn mul(self, other: Self) -> Self {
         Self {
@@ -172,10 +157,10 @@ impl Mul for Vec2_f64
 
 #[test]
 fn test_vec2_math() {
-    let vec1 = Vec2::new(0.5, 1.0);
-    let vec2 = Vec2::new(1.0, 0.5);
-    assert_eq!(vec1 + vec2, Vec2::new(0.5 + 1.0, 1.0 + 0.5));
-    assert_eq!(vec1 - vec2, Vec2::new(0.5 - 1.0, 1.0 - 0.5));
-    assert_eq!(vec1 / vec2, Vec2::new(0.5 / 1.0, 1.0 / 0.5));
-    assert_eq!(vec1 * vec2, Vec2::new(0.5 * 1.0, 1.0 * 0.5));
+    let vec1 = Vec2_f64::new(0.5, 1.0);
+    let vec2 = Vec2_f64::new(1.0, 0.5);
+    assert_eq!(vec1 + vec2, Vec2_f64::new(0.5 + 1.0, 1.0 + 0.5));
+    assert_eq!(vec1 - vec2, Vec2_f64::new(0.5 - 1.0, 1.0 - 0.5));
+    assert_eq!(vec1 / vec2, Vec2_f64::new(0.5 / 1.0, 1.0 / 0.5));
+    assert_eq!(vec1 * vec2, Vec2_f64::new(0.5 * 1.0, 1.0 * 0.5));
 }
