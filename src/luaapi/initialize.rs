@@ -1,4 +1,4 @@
-use crate::gamedata::{Scene, Time, Vec3};
+use crate::gamedata::{Scene, Time, Vec3_f64, Vec2_f64, Speed};
 use crate::luaapi::{CH, CHARA, SCREEN, TASK};
 use crate::RunningLua;
 use rlua::Context;
@@ -73,9 +73,19 @@ pub fn initialize_lua_environment(lua: &RunningLua, scene: &Arc<Mutex<Scene>>) {
         globals.set("CH", CH_function).unwrap();
         // add Vector
         let Vector_function = ctx
-            .create_function(|_, (x, y, z): (f64, f64, f64)| Ok(Vec3::new(x, y, z)))
+            .create_function(|_, (x, y, z): (f64, f64, f64)| Ok(Vec3_f64::new(x, y, z)))
             .unwrap();
         globals.set("Vector", Vector_function).unwrap();
+        // add Vector2
+        let Vector2_function = ctx
+            .create_function(|_, (x, y): (f64, f64)| Ok(Vec2_f64::new(x, y)))
+            .unwrap();
+        globals.set("Vector2", Vector2_function).unwrap();
+        // add Speed
+        let Speed_function = ctx
+            .create_function(|_, speed: f64| Ok(Speed::new(speed)))
+            .unwrap();
+        globals.set("Speed", Speed_function).unwrap();
         // add TimeSec
         let TimeSec_function = ctx
             .create_function(|_, time_sec: f64| Ok(Time::new(time_sec)))
@@ -95,6 +105,7 @@ pub fn initialize_lua_environment(lua: &RunningLua, scene: &Arc<Mutex<Scene>>) {
         add_non_blocking_method(&ctx, "DynamicRemove", 1);
         add_non_blocking_method(&ctx, "DynamicLoad", 2);
         add_non_blocking_method(&ctx, "SetPosition", 1);
+        add_non_blocking_method(&ctx, "WalkTo", 2);
         add_blocking_method(&ctx, "Sleep", 1);
         add_blocking_method(&ctx, "FadeOut", 2);
     })

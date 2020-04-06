@@ -1,36 +1,35 @@
 use rlua::UserData;
 use std::ops::{AddAssign, SubAssign};
 
+/// time, in second
 #[derive(Debug, Clone, PartialEq, Copy)]
-pub struct Time {
-    duration: f64,
-}
+pub struct Time(pub f64);
 
 impl Time {
     pub fn new(duration: f64) -> Self {
-        Self { duration }
+        Self(duration)
     }
 
     /// Return the time contained by this structure, in second
     pub fn get_time(&self) -> f64 {
-        self.duration
+        self.0
     }
 
     /// Define the time contained by this structure, in second
     pub fn set_time(&mut self, duration: f64) {
-        self.duration = duration
+        self.0 = duration
     }
 }
 
 impl SubAssign for Time {
     fn sub_assign(&mut self, other: Self) {
-        self.duration -= other.duration
+        self.0 -= other.0
     }
 }
 
 impl AddAssign for Time {
     fn add_assign(&mut self, other: Self) {
-        self.duration += other.duration
+        self.0 += other.0
     }
 }
 

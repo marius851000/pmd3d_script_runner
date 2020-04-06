@@ -1,4 +1,4 @@
-use crate::gamedata::{Scene, Update, Vec3};
+use crate::gamedata::{Scene, Update, Vec3_f64, Vec2_f64, Speed};
 use rlua::{UserData, UserDataMethods};
 use std::sync::{Arc, Mutex};
 
@@ -14,10 +14,15 @@ impl CH {
 }
 impl UserData for CH {
     fn add_methods<'lua, M: UserDataMethods<'lua, Self>>(methods: &mut M) {
-        methods.add_method("SetPosition", |_, this, position: Vec3<f64>| {
+        methods.add_method("SetPosition", |_, this, position: Vec3_f64| {
             let mut scene = this.scene.lock().unwrap();
             scene.update(Update::SetPosition(this.id.clone(), position));
             Ok(())
         });
+        methods.add_method("WalkTo", |_, this, (position, speed): (Vec2_f64, Speed)| {
+            let mut scene = this.scene.lock().unwrap();
+            scene.update(Update::WalkTo(this.id.clone(), position, speed));
+            Ok(())
+        })
     }
 }

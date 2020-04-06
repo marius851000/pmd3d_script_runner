@@ -1,4 +1,4 @@
-use crate::gamedata::{Color, Lock, Time, Vec3};
+use crate::gamedata::{Color, Lock, Time, Vec3_f64, Vec2_f64, Speed};
 
 /// This enum store everything that can update the scene
 #[derive(Debug, Clone)]
@@ -8,7 +8,9 @@ pub enum Update {
     /// id, actor
     AddChara(String, String),
     /// id, position
-    SetPosition(String, Vec3<f64>),
+    SetPosition(String, Vec3_f64),
+    /// id, posititon, speed
+    WalkTo(String, Vec2_f64, Speed),
     /// Lock
     AddLock(Lock),
     /// time spent

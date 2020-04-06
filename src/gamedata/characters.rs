@@ -1,20 +1,79 @@
-use crate::gamedata::Vec3;
+use crate::gamedata::{Vec3_f64, Vec2_f64, Speed, Time};
+
+#[derive(Debug)]
+struct WalkTo {
+    destination: Vec2_f64,
+    speed: Speed,
+}
+
+#[derive(Debug)]
+enum OngoingMovement {
+    None,
+    WalkTo(WalkTo)
+}
 
 #[derive(Debug)]
 pub struct Chara {
-    pub position: Vec3<f64>,
+    pub position: Vec3_f64,
+    ongoing_movement: OngoingMovement,
     _actor: String, //TODO: change with another data structure
 }
 
 impl Chara {
     pub fn new(actor: String) -> Self {
         Self {
-            position: Vec3::default(),
+            position: Vec3_f64::default(),
+            ongoing_movement: OngoingMovement::None,
             _actor: actor,
         }
     }
 
-    pub fn set_position(&mut self, position: Vec3<f64>) {
+    pub fn abort_ongoing_movement(&mut self) {
+        let mut should_reinitialize = false;
+        match self.ongoing_movement {
+            OngoingMovement::None => (),
+            OngoingMovement::WalkTo(_) => should_reinitialize = true,
+        };
+        if should_reinitialize {
+            self.ongoing_movement = OngoingMovement::None;
+        }
+    }
+
+    pub fn set_position(&mut self, position: Vec3_f64) {
+        self.abort_ongoing_movement(); //verified in game with WalkTo
         self.position = position;
+    }
+
+    pub fn walk_to(&mut self, destination: Vec2_f64, speed: Speed) {
+        self.abort_ongoing_movement();
+        self.ongoing_movement = OngoingMovement::WalkTo(WalkTo {
+            destination,
+            speed,
+        })
+    }
+
+    pub fn time_spent(&mut self, time: &Time) {
+        let moved = match &self.ongoing_movement {
+            OngoingMovement::None => false,
+            OngoingMovement::WalkTo(walk_to) => {
+                // Distance between the actual posititon and the destination
+                let distance_to_target = walk_to.destination.distance(&self.position.to_vec2());
+                let distance_able_to_walk = walk_to.speed.0 * time.0;
+                let (walked_to, finished) = if distance_able_to_walk < distance_to_target {
+                    let vector = (walk_to.destination - self.position.to_vec2()).normalize();
+                    (self.position.to_vec2() + Vec2_f64 {
+                        x: vector.x * distance_able_to_walk,
+                        y: vector.y * distance_able_to_walk,
+                    }, true)
+                } else {
+                    (walk_to.destination, false)
+                };
+                self.position = walked_to.to_vec3(0.0);
+                finished
+            },
+        };
+        if !moved {
+            self.ongoing_movement = OngoingMovement::None;
+        };
     }
 }

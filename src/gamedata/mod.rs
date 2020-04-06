@@ -7,7 +7,7 @@ mod update;
 pub use update::Update;
 
 mod vectors;
-pub use vectors::Vec3;
+pub use vectors::{Vec3_f64, Vec2_f64};
 
 mod characters;
 pub use characters::Chara;
@@ -23,3 +23,6 @@ pub use color::Color;
 
 mod screen;
 pub use screen::Screen;
+
+mod speed;
+pub use speed::Speed;
