@@ -1,12 +1,22 @@
 extern crate piston_window;
+use std::collections::HashMap;
 use crate::render::Camera;
+use crate::render::{WanStore};
 use crate::Input;
 use crate::Logic;
 use piston_window::*;
+use std::path::Path;
+use opendungeon_rom_cpack::CPack;
+use std::path::PathBuf;
+use ndsrom::NdsRom;
+use crate::gamedata::Update;
+use crate::render::CharacterSprite;
 
 pub struct PistonRenderer {
     window: PistonWindow,
     logic: Option<Logic>,
+    image_store: Option<WanStore>,
+    characters_sprite: Option<HashMap<String, CharacterSprite>>,
 }
 
 impl PistonRenderer {
@@ -18,15 +28,26 @@ impl PistonRenderer {
                 .build()
                 .unwrap(),
             logic: None,
+            image_store: None,
+            characters_sprite: Some(HashMap::new()),
         }
     }
 
     pub fn load(&mut self, code: &str) {
         self.logic = Some(Logic::new(code));
+        //TODO: do not hardcode the path
+        let rom = NdsRom::new_from_string(".");
+        self.image_store = Some(WanStore::new(CPack::new_from_bytes(
+            rom.read_file(PathBuf::from("data/MONSTER/m_ground.bin")).unwrap()
+        ).unwrap()));
+        //let cpack = CPack::new_from_bytes();
     }
 
     pub fn run(&mut self) {
+        let image_store: &mut WanStore = self.image_store.as_mut().unwrap();
         let logic: &mut Logic = self.logic.as_mut().unwrap();
+        let characters_sprite = self.characters_sprite.as_mut().unwrap();
+
         // What does a position unit represent in pixel ? (float)
         let scale = 100.0;
         let scale_div2 = scale / 2.0;
@@ -34,9 +55,38 @@ impl PistonRenderer {
         while let Some(e) = self.window.next() {
             if let Event::Loop(Loop::Update(update_arg)) = e {
                 logic.execute(Input::new(update_arg.dt));
+                for update in logic.get_and_clear_updates() {
+                    match update {
+                        Update::AddChara(charid, actor) => {
+                            let spriteid = match actor.as_str() {
+                                "KIBAGO" => 3,
+                                "TSUTAAJA" => 6,
+                                _ => 597,
+                            };
+                            let wan_sprite = image_store.get_sprite(&mut self.window.create_texture_context(), spriteid);
+                            let mut spr = CharacterSprite::new_from_wan_sprite(wan_sprite);
+                            spr.set_animation(16, true);
+                            characters_sprite.insert(charid, spr);
+                        },
+                        Update::DelChara(charid) => {characters_sprite.remove(&charid);},
+                        Update::TimeSpent(time) => {
+                            for chara in characters_sprite.values_mut() {
+                                chara.time_spent(time);
+                            };
+                        },
+                        Update::WalkTo(charid, _, _) => {
+                            characters_sprite.get_mut(&charid).unwrap().set_animation(0, true);
+                        },
+                        Update::StartIDLE(charid) => {
+                            characters_sprite.get_mut(&charid).unwrap().set_animation(16, true);
+                        }
+                        _ => (),
+                    }
+                }
             };
 
             let scene_arc = logic.scene.clone();
+
             self.window.draw_2d(&e, |c, g, _device| {
                 let scene = scene_arc.lock().unwrap();
                 let viewport = c.viewport.as_ref().unwrap();
@@ -45,22 +95,11 @@ impl PistonRenderer {
                 camera.set_screen_size((screen_x, screen_y));
                 //clear the screen
                 clear([1.0; 4], g);
-                //draw charas
-                for chara in scene.charas.values() {
+                //draw characters
+                for (charaid, chara) in scene.charas.iter() {
                     let display_data =
-                        camera.compute_display_data((chara.position.x, chara.position.y), 0.0);
-                    //TODO: draw the angle
-                    rectangle(
-                        [0.5, 0.5, 0.5, 1.0],
-                        [
-                            display_data.x_pixel - scale_div2,
-                            display_data.y_pixel - scale_div2,
-                            scale,
-                            scale,
-                        ],
-                        c.transform,
-                        g,
-                    )
+                        camera.compute_display_data((chara.position.x, -chara.position.y), 0.0);
+                    characters_sprite.get_mut(charaid).unwrap().draw(g, &c, &(display_data.x_pixel, display_data.y_pixel), scale/32.0, chara.angle);
                 }
                 //render the front screen
                 rectangle(

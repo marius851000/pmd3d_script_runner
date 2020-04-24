@@ -9,3 +9,9 @@ edition = "2018"
 [dependencies]
 rlua = "0.17.0"
 piston_window = "0.107.0"
+#NOTE: need to clean up. mysterydungeongeneration folder is actually from opendungeon (can be found on framagit)
+opendungeon-rom-wan = {path = "../../../programming project/mysterydungeongeneration/gamedata/rom/wan"}
+opendungeon-rom-cpack = {path = "../../../programming project/mysterydungeongeneration/gamedata/rom/cpack"}
+opendungeon-rom-pkdpx = {path = "../../../programming project/mysterydungeongeneration/gamedata/rom/pkdpx"}
+ndsrom = { path = "../../../programming project/mysterydungeongeneration/gamedata/rom/ndsrom"}
+image = "0.23.2"

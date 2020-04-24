@@ -19,4 +19,6 @@ pub enum Update {
     SetScreenColor(u16, Color),
     /// Do a transition of the color of a screen (by it's id)
     TransitionScreenColor(u16, Time, Color),
+    /// The pokemeon finished everything, can start the IDLE animation
+    StartIDLE(String),
 }

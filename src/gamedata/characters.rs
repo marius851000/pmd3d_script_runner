@@ -16,6 +16,7 @@ enum OngoingMovement {
 pub struct Chara {
     pub position: Vec3_f64,
     ongoing_movement: OngoingMovement,
+    pub angle: f64,
     _actor: String, //TODO: change with another data structure
 }
 
@@ -24,6 +25,7 @@ impl Chara {
         Self {
             position: Vec3_f64::default(),
             ongoing_movement: OngoingMovement::None,
+            angle: 0.0,
             _actor: actor,
         }
     }
@@ -49,7 +51,7 @@ impl Chara {
         self.ongoing_movement = OngoingMovement::WalkTo(WalkTo { destination, speed })
     }
 
-    pub fn time_spent(&mut self, time: Time) {
+    pub fn time_spent(&mut self, time: Time) -> bool {
         let moved = match &self.ongoing_movement {
             OngoingMovement::None => false,
             OngoingMovement::WalkTo(walk_to) => {
@@ -58,6 +60,11 @@ impl Chara {
                 let distance_able_to_walk = walk_to.speed.0 * time.0;
                 let (walked_to, finished) = if distance_able_to_walk < distance_to_target {
                     let vector = (walk_to.destination - self.position.to_vec2()).normalize();
+                    self.angle = if vector.x >= 0.0 {
+                        f64::atan(vector.y/vector.x)
+                    } else {
+                        f64::atan(vector.y/vector.x) + std::f64::consts::PI
+                    };
                     (
                         self.position.to_vec2()
                             + Vec2_f64 {
@@ -75,6 +82,9 @@ impl Chara {
         };
         if !moved {
             self.ongoing_movement = OngoingMovement::None;
-        };
+            true
+        } else {
+            false
+        }
     }
 }

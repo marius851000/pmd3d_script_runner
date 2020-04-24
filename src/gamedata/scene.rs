@@ -70,8 +70,10 @@ impl Scene {
                 for screen in &mut self.screens {
                     screen.time_spent(*time);
                 }
-                for chara in self.charas.values_mut() {
-                    chara.time_spent(*time);
+                for (charid, chara) in self.charas.iter_mut() {
+                    if chara.time_spent(*time) {
+                        self.updates.push(Update::StartIDLE(charid.clone()));
+                    };
                 }
             }
             Update::SetScreenColor(screen_id, color) => {
@@ -80,6 +82,7 @@ impl Scene {
             Update::TransitionScreenColor(screen_id, duration, color) => self.screens
                 [*screen_id as usize]
                 .set_color_transition(duration.clone(), color.clone()),
+            Update::StartIDLE(_) => (),
         };
         self.updates.push(update);
     }

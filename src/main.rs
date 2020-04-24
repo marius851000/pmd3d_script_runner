@@ -11,7 +11,21 @@ CH("HERO"):WalkTo(Vector2(3, 0), Speed(1))
 CH("PARTNER"):SetPosition(Vector(-1, 0, 0))
 CH("PARTNER"):WalkTo(Vector2(-1, 1), Speed(0.5))
 TASK:Sleep(TimeSec(2))
-CH("PARTNER"):WalkTo(Vector2(-1, 0), Speed(1))
+CH("PARTNER"):WalkTo(Vector2(0, 0), Speed(1))
+TASK:Sleep(TimeSec(2))
+while true do
+    TASK:Sleep(TimeSec(2))
+    CH("PARTNER"):WalkTo(Vector2(0, 3), Speed(1))
+    TASK:Sleep(TimeSec(5))
+    CH("PARTNER"):WalkTo(Vector2(0, 0), Speed(1))
+    TASK:Sleep(TimeSec(5))
+    CH("PARTNER"):WalkTo(Vector2(-3, 0), Speed(1.5))
+    TASK:Sleep(TimeSec(3))
+    CH("PARTNER"):WalkTo(Vector2(1, -3), Speed(2))
+    TASK:Sleep(TimeSec(5))
+    CH("PARTNER"):WalkTo(Vector2(0, 0), Speed(1))
+    TASK:Sleep(TimeSec(3))
+end
 -- Speed is in unit per second
 "#,
     );
