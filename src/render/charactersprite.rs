@@ -1,7 +1,7 @@
-use crate::render::{WanHandler, WanSprite};
-use std::rc::Rc;
-use piston_window::*;
 use crate::gamedata::Time;
+use crate::render::{WanHandler, WanSprite};
+use piston_window::*;
+use std::rc::Rc;
 
 pub struct CharacterSprite {
     handler: WanHandler,
@@ -21,8 +21,8 @@ impl CharacterSprite {
             handler,
             change_with_angle: false,
             anim_id: 0,
-            time_before_next_frame: Time::new(0.1/6.0),
-            time_between_frame: Time::new(0.1/6.0),
+            time_before_next_frame: Time::new(0.1 / 6.0),
+            time_between_frame: Time::new(0.1 / 6.0),
         };
         result.set_animation(0, false);
         result
@@ -38,11 +38,24 @@ impl CharacterSprite {
         self.handler.start_animation(anim_id);
     }
 
-    pub fn draw(&mut self, graphic: &mut G2d, context: &Context, coord: &(f64, f64), scale: f64, angle: f64) {
+    pub fn draw(
+        &mut self,
+        graphic: &mut G2d,
+        context: &Context,
+        coord: &(f64, f64),
+        scale: f64,
+        angle: f64,
+    ) {
         if self.change_with_angle {
-            let anim_angle_change = ((((angle / std::f64::consts::FRAC_PI_4).round() + 4.0)) as usize + 6) % 8;
-            let anim_angle_change = if anim_angle_change == 8 { 0 } else { anim_angle_change };
-            self.handler.transmute_animation(self.anim_id + anim_angle_change);
+            let anim_angle_change =
+                (((angle / std::f64::consts::FRAC_PI_4).round() + 4.0) as usize + 6) % 8;
+            let anim_angle_change = if anim_angle_change == 8 {
+                0
+            } else {
+                anim_angle_change
+            };
+            self.handler
+                .transmute_animation(self.anim_id + anim_angle_change);
         };
         self.handler.draw_frame(graphic, context, coord, scale);
     }
@@ -52,6 +65,6 @@ impl CharacterSprite {
         while self.time_before_next_frame <= Time(0.0) {
             self.handler.next_frame();
             self.time_before_next_frame += self.time_between_frame;
-        };
+        }
     }
 }

@@ -1,21 +1,22 @@
 extern crate piston_window;
-use std::collections::HashMap;
+use crate::gamedata::Update;
 use crate::render::Camera;
-use crate::render::{WanStore};
+use crate::render::CharacterSprite;
+use crate::render::WanStore;
 use crate::Input;
 use crate::Logic;
+use opendungeon_common::Bytes;
 use piston_window::*;
+use pmd_cpack::CPack;
+use std::collections::HashMap;
+use std::fs::File;
 use std::path::Path;
-use opendungeon_rom_cpack::CPack;
 use std::path::PathBuf;
-use ndsrom::NdsRom;
-use crate::gamedata::Update;
-use crate::render::CharacterSprite;
 
 pub struct PistonRenderer {
     window: PistonWindow,
     logic: Option<Logic>,
-    image_store: Option<WanStore>,
+    image_store: Option<WanStore<File>>,
     characters_sprite: Option<HashMap<String, CharacterSprite>>,
 }
 
@@ -36,15 +37,14 @@ impl PistonRenderer {
     pub fn load(&mut self, code: &str) {
         self.logic = Some(Logic::new(code));
         //TODO: do not hardcode the path
-        let rom = NdsRom::new_from_string(".");
-        self.image_store = Some(WanStore::new(CPack::new_from_bytes(
-            rom.read_file(PathBuf::from("data/MONSTER/m_ground.bin")).unwrap()
-        ).unwrap()));
-        //let cpack = CPack::new_from_bytes();
+        self.image_store = Some(WanStore::new(
+            CPack::new_from_file(File::open(PathBuf::from("data/MONSTER/m_ground.bin")).unwrap())
+                .unwrap(),
+        ));
     }
 
     pub fn run(&mut self) {
-        let image_store: &mut WanStore = self.image_store.as_mut().unwrap();
+        let image_store = self.image_store.as_mut().unwrap();
         let logic: &mut Logic = self.logic.as_mut().unwrap();
         let characters_sprite = self.characters_sprite.as_mut().unwrap();
 
@@ -63,22 +63,31 @@ impl PistonRenderer {
                                 "TSUTAAJA" => 6,
                                 _ => 597,
                             };
-                            let wan_sprite = image_store.get_sprite(&mut self.window.create_texture_context(), spriteid);
+                            let wan_sprite = image_store
+                                .get_sprite(&mut self.window.create_texture_context(), spriteid);
                             let mut spr = CharacterSprite::new_from_wan_sprite(wan_sprite);
                             spr.set_animation(16, true);
                             characters_sprite.insert(charid, spr);
-                        },
-                        Update::DelChara(charid) => {characters_sprite.remove(&charid);},
+                        }
+                        Update::DelChara(charid) => {
+                            characters_sprite.remove(&charid);
+                        }
                         Update::TimeSpent(time) => {
                             for chara in characters_sprite.values_mut() {
                                 chara.time_spent(time);
-                            };
-                        },
+                            }
+                        }
                         Update::WalkTo(charid, _, _) => {
-                            characters_sprite.get_mut(&charid).unwrap().set_animation(0, true);
-                        },
+                            characters_sprite
+                                .get_mut(&charid)
+                                .unwrap()
+                                .set_animation(0, true);
+                        }
                         Update::StartIDLE(charid) => {
-                            characters_sprite.get_mut(&charid).unwrap().set_animation(16, true);
+                            characters_sprite
+                                .get_mut(&charid)
+                                .unwrap()
+                                .set_animation(16, true);
                         }
                         _ => (),
                     }
@@ -99,7 +108,13 @@ impl PistonRenderer {
                 for (charaid, chara) in scene.charas.iter() {
                     let display_data =
                         camera.compute_display_data((chara.position.x, -chara.position.y), 0.0);
-                    characters_sprite.get_mut(charaid).unwrap().draw(g, &c, &(display_data.x_pixel, display_data.y_pixel), scale/32.0, chara.angle);
+                    characters_sprite.get_mut(charaid).unwrap().draw(
+                        g,
+                        &c,
+                        &(display_data.x_pixel, display_data.y_pixel),
+                        scale / 32.0,
+                        chara.angle,
+                    );
                 }
                 //render the front screen
                 rectangle(

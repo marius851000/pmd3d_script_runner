@@ -1,6 +1,6 @@
 use rlua::UserData;
-use std::ops::{AddAssign, SubAssign};
 use std::cmp::Ordering;
+use std::ops::{AddAssign, SubAssign};
 
 /// time, in second
 #[derive(Debug, Clone, PartialEq, Copy)]
@@ -35,7 +35,7 @@ impl AddAssign for Time {
 }
 
 impl PartialOrd for Time {
-    fn partial_cmp(&self, other: &Self) -> Option<Ordering>{
+    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
         self.0.partial_cmp(&other.0)
     }
 }

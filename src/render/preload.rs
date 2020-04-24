@@ -1,5 +1,5 @@
-use std::thread;
 use std::rc::Rc;
+use std::thread;
 
 // Dynamic loading related stuff
 
@@ -13,7 +13,7 @@ pub enum PreLoadState {
 pub struct PreLoad<Finished, Intermediary> {
     pub state: PreLoadState,
     handle: Option<thread::JoinHandle<Intermediary>>,
-    result: Option<Rc<Finished>>
+    result: Option<Rc<Finished>>,
 }
 
 impl<Finished, Intermediary> PreLoad<Finished, Intermediary> {
@@ -28,9 +28,13 @@ impl<Finished, Intermediary> PreLoad<Finished, Intermediary> {
     pub fn set_status_loading(&mut self, handle: thread::JoinHandle<Intermediary>) {
         match self.state {
             PreLoadState::NotLoading => self.handle = Some(handle),
-            PreLoadState::Loading => {panic!("want to preload something which is already loading!!! ignoring it.")},
-            PreLoadState::Failed => {self.handle = Some(handle)},
-            PreLoadState::Loaded => {panic!("want to preload something which is already fully loaded!!! ignoring it.")},
+            PreLoadState::Loading => {
+                panic!("want to preload something which is already loading!!! ignoring it.")
+            }
+            PreLoadState::Failed => self.handle = Some(handle),
+            PreLoadState::Loaded => {
+                panic!("want to preload something which is already fully loaded!!! ignoring it.")
+            }
         };
         self.state = PreLoadState::Loading;
     }
@@ -52,20 +56,23 @@ impl<Finished, Intermediary> PreLoad<Finished, Intermediary> {
             PreLoadState::NotLoading => (),
             PreLoadState::Loading => self.handle = None,
             PreLoadState::Failed => (),
-            PreLoadState::Loaded => panic!("trying to set a content while it was already set!!! overwriting it"),
+            PreLoadState::Loaded => {
+                panic!("trying to set a content while it was already set!!! overwriting it")
+            }
         };
         self.state = PreLoadState::Loaded;
         self.result = Some(Rc::new(result));
     }
 
     pub fn get_result(&mut self) -> Rc<Finished> {
-        match self.result.take() { //TODO: quite hacky
+        match self.result.take() {
+            //TODO: quite hacky
             None => panic!("Impossible to get a result, as it not yet computed !"),
             Some(value) => {
                 let result = value.clone();
                 self.result = Some(value);
                 result
-            },
+            }
         }
     }
 }

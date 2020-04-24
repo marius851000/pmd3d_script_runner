@@ -61,9 +61,9 @@ impl Chara {
                 let (walked_to, finished) = if distance_able_to_walk < distance_to_target {
                     let vector = (walk_to.destination - self.position.to_vec2()).normalize();
                     self.angle = if vector.x >= 0.0 {
-                        f64::atan(vector.y/vector.x)
+                        f64::atan(vector.y / vector.x)
                     } else {
-                        f64::atan(vector.y/vector.x) + std::f64::consts::PI
+                        f64::atan(vector.y / vector.x) + std::f64::consts::PI
                     };
                     (
                         self.position.to_vec2()

@@ -1,26 +1,28 @@
 extern crate piston_window;
+use crate::render::{PreLoad, PreLoadState};
 use ::image::ImageBuffer;
-use opendungeon_rom_wan::WanImage as WanImg;
-use opendungeon_rom_wan::wan::{MetaFrameStore, AnimStore};
-use opendungeon_rom_cpack::CPack;
+use opendungeon_common::Bytes;
 use opendungeon_rom_pkdpx::{decompress_px, is_px};
+use opendungeon_rom_wan::wan::{AnimStore, MetaFrameStore};
+use opendungeon_rom_wan::WanImage as WanImg;
+use piston_window::*;
+use pmd_cpack::CPack;
+use std::io::{Read, Seek};
 use std::thread;
 use std::{rc::Rc, sync::Arc};
-use crate::render::{PreLoad, PreLoadState};
-use piston_window::*;
 
-pub struct WanStore {
-    pack: Arc<CPack>,
+pub struct WanStore<F: 'static + Read + Seek + Send> {
+    pack: Arc<CPack<F>>,
     sprites: Vec<PreLoad<WanSprite, WanImg>>,
 }
 
-impl WanStore {
-    pub fn new(pack: CPack) -> WanStore {
+impl<F: 'static + Read + Seek + Send> WanStore<F> {
+    pub fn new(pack: CPack<F>) -> WanStore<F> {
         let mut sprites = Vec::new();
         for _ in 0..pack.len() {
             sprites.push(PreLoad::new_empty());
         }
-        WanStore{
+        WanStore {
             pack: Arc::new(pack),
             sprites: sprites,
         }
@@ -37,7 +39,7 @@ impl WanStore {
         }
         let pack = self.pack.clone();
         let handle = thread::spawn(move || {
-            let mut file = pack.get_file(sprite_id);
+            let mut file = Bytes::new_from_io(pack.get_file(sprite_id).unwrap()).unwrap();
             if is_px(&mut file) {
                 WanImg::new_from_bytes(decompress_px(file).unwrap()).unwrap()
             } else {
@@ -48,7 +50,11 @@ impl WanStore {
         ()
     }
 
-    pub fn get_sprite(&mut self, texture_context: &mut G2dTextureContext, sprite_id: usize) -> Rc<WanSprite> {
+    pub fn get_sprite(
+        &mut self,
+        texture_context: &mut G2dTextureContext,
+        sprite_id: usize,
+    ) -> Rc<WanSprite> {
         if sprite_id >= self.pack.len() {
             panic!("the sprite id does not exist !");
         };
@@ -60,8 +66,9 @@ impl WanStore {
         match &self.sprites[sprite_id].state {
             PreLoadState::Loading => {
                 let content = self.sprites[sprite_id].join();
-                self.sprites[sprite_id].set_result(WanSprite::new_from_wan(content, texture_context));
-            },
+                self.sprites[sprite_id]
+                    .set_result(WanSprite::new_from_wan(content, texture_context));
+            }
             _ => (),
         };
 
@@ -81,7 +88,7 @@ pub struct WanHandler {
 
 impl WanHandler {
     pub fn new(sprite: Rc<WanSprite>, with_shadow: bool) -> WanHandler {
-        WanHandler{
+        WanHandler {
             sprite: sprite,
             frame: 0,
             animation: 0,
@@ -115,16 +122,27 @@ impl WanHandler {
                 self.frame = 0;
             };
         };
-
     }
 
-    pub fn draw_next_frame(&mut self, graphic: &mut G2d, context: &Context, coord: &(f64,f64), scale: f64) -> () {
+    pub fn draw_next_frame(
+        &mut self,
+        graphic: &mut G2d,
+        context: &Context,
+        coord: &(f64, f64),
+        scale: f64,
+    ) -> () {
         //TODO: use the real time between two call to this function
         self.draw_frame(graphic, context, coord, scale);
         self.next_frame();
     }
 
-    pub fn draw_frame(&self, graphic: &mut G2d, context: &Context, coord: &(f64, f64), scale: f64) -> () {
+    pub fn draw_frame(
+        &self,
+        graphic: &mut G2d,
+        context: &Context,
+        coord: &(f64, f64),
+        scale: f64,
+    ) -> () {
         if !self.animation_loaded {
             panic!("no animation is loaded for a WanHandler !!!");
             //TODO: play the first one instead
@@ -132,7 +150,15 @@ impl WanHandler {
         if self.frame >= std::u16::MAX as usize {
             panic!("the number of frame of an animation has gone to it's maximum!!! That should never happen, as it should return to 0 when the animation end (or crash for any other reason while drawing previous frame) !!! Restarting it anyway")
         }
-        self.sprite.draw_animation(graphic, &context, self.animation, self.frame as u16, self.with_shadow, coord, scale);
+        self.sprite.draw_animation(
+            graphic,
+            &context,
+            self.animation,
+            self.frame as u16,
+            self.with_shadow,
+            coord,
+            scale,
+        );
     }
 
     pub fn next_frame(&mut self) {
@@ -166,13 +192,16 @@ pub struct WanImage {
 }
 
 impl WanImage {
-    fn new(mut data: Vec<u8>, width: u32, height: u32, texture_context: &mut G2dTextureContext) -> WanImage {
-        let surface = ImageBuffer::from_raw(
-            width,
-            height,
-            data).unwrap(); //TODO: see if there isn't an already existing image -> Surface
+    fn new(
+        mut data: Vec<u8>,
+        width: u32,
+        height: u32,
+        texture_context: &mut G2dTextureContext,
+    ) -> WanImage {
+        let surface = ImageBuffer::from_raw(width, height, data).unwrap(); //TODO: see if there isn't an already existing image -> Surface
 
-        let texture = Texture::from_image(texture_context, &surface, &TextureSettings::new()).unwrap();
+        let texture =
+            Texture::from_image(texture_context, &surface, &TextureSettings::new()).unwrap();
 
         WanImage {
             texture: texture,
@@ -180,7 +209,14 @@ impl WanImage {
             height: height as f32,
         }
     }
-    fn draw(&self, graphic: &mut G2d, context: &Context, coord: &(f64,f64), scale: f64, flip: (bool, bool)) -> () {
+    fn draw(
+        &self,
+        graphic: &mut G2d,
+        context: &Context,
+        coord: &(f64, f64),
+        scale: f64,
+        flip: (bool, bool),
+    ) -> () {
         /*if flip.0 || flip.1 {
             canvas.get_renderer().copy_ex(
                 &self.texture,
@@ -205,8 +241,17 @@ impl WanImage {
         let scaled_height = 0.0;*/
         image(
             &self.texture,
-            context.transform.trans(coord.0 + if flip.0 {scaled_width} else {0.0}, coord.1 + if flip.1 {scaled_height} else {0.0}).scale(if flip.0 {-scale} else {scale}, if flip.1 {-scale} else {scale}),
-            graphic
+            context
+                .transform
+                .trans(
+                    coord.0 + if flip.0 { scaled_width } else { 0.0 },
+                    coord.1 + if flip.1 { scaled_height } else { 0.0 },
+                )
+                .scale(
+                    if flip.0 { -scale } else { scale },
+                    if flip.1 { -scale } else { scale },
+                ),
+            graphic,
         );
     }
 }
@@ -227,74 +272,112 @@ impl WanSprite {
             images.push(image);
         }
 
-        WanSprite{
+        WanSprite {
             images: images,
             meta_frames: wan.meta_frame_store,
             animations: wan.anim_store,
         }
     }
 
-    pub fn draw_image(&self, graphic: &mut G2d, context: &Context, image_id: usize, coord: &(f64,f64), scale: f64, flip: (bool, bool)) -> () {
+    pub fn draw_image(
+        &self,
+        graphic: &mut G2d,
+        context: &Context,
+        image_id: usize,
+        coord: &(f64, f64),
+        scale: f64,
+        flip: (bool, bool),
+    ) -> () {
         if image_id >= self.images.len() {
             panic!("the image id is superior to the lenght of the image list.");
         };
         self.images[image_id].draw(graphic, context, coord, scale, flip);
     }
 
-    pub fn draw_meta_frame_group(&self, graphic: &mut G2d, context: &Context, meta_frame_group_id: usize, coord: &(f64,f64), scale: f64) -> () {
+    pub fn draw_meta_frame_group(
+        &self,
+        graphic: &mut G2d,
+        context: &Context,
+        meta_frame_group_id: usize,
+        coord: &(f64, f64),
+        scale: f64,
+    ) -> () {
         if meta_frame_group_id >= self.meta_frames.meta_frame_groups.len() {
             panic!("the meta-frame id is superior to the lenght of the meta-frames list");
         };
         let meta_frames = &self.meta_frames.meta_frames;
-        for meta_frame_id in &self.meta_frames.meta_frame_groups[meta_frame_group_id].meta_frames_id {
+        for meta_frame_id in &self.meta_frames.meta_frame_groups[meta_frame_group_id].meta_frames_id
+        {
             let meta_frame = &meta_frames[*meta_frame_id];
             let image_id = meta_frame.image_index;
             let offset_x = ((meta_frame.offset_x as f64) * scale) as f64;
             let offset_y = ((meta_frame.offset_y as f64) * scale) as f64;
-            self.draw_image(graphic, context, image_id, &(coord.0+offset_x, coord.1+offset_y), scale, (meta_frame.h_flip, meta_frame.v_flip));
-        };
+            self.draw_image(
+                graphic,
+                context,
+                image_id,
+                &(coord.0 + offset_x, coord.1 + offset_y),
+                scale,
+                (meta_frame.h_flip, meta_frame.v_flip),
+            );
+        }
     }
 
-    pub fn draw_animation(&self, graphic: &mut G2d, context: &Context, animation_id: usize, frame_number: u16, with_shadow: bool, coord: &(f64,f64), scale: f64) -> () {
+    pub fn draw_animation(
+        &self,
+        graphic: &mut G2d,
+        context: &Context,
+        animation_id: usize,
+        frame_number: u16,
+        with_shadow: bool,
+        coord: &(f64, f64),
+        scale: f64,
+    ) -> () {
         if animation_id >= self.animations.len() {
             panic!("the animation id is superior to the number of animation");
         };
         let mut frame_id = None;
         let mut frame_actual_number: u16 = 0;
         for actual_frame_id in 0..self.animations.animations[animation_id].len() {
-            frame_actual_number += self.animations.animations[animation_id].frames[actual_frame_id].duration as u16;
+            frame_actual_number +=
+                self.animations.animations[animation_id].frames[actual_frame_id].duration as u16;
             if frame_actual_number > frame_number {
                 frame_id = Some(actual_frame_id);
-                break
+                break;
             };
         }
 
         match frame_id {
             None => panic!("the frame number is too high, and is not found in the animation."),
             Some(id) => {
-
                 let frame = &self.animations.animations[animation_id].frames[id];
                 let coord_x = coord.0 + (((frame.offset_x as f64) * scale) as f64);
                 let coord_y = coord.1 + (((frame.offset_y as f64) * scale) as f64);
                 //draw shadow
                 if with_shadow {
-                    let shadow_x = coord.0 + (((frame.shadow_offset_x as f64) * scale)) as f64;
-                    let shadow_y = coord.1 + (((frame.shadow_offset_y as f64) * scale)) as f64;
-                    let shadow_coeff = (10.0*scale) as f64;
+                    let shadow_x = coord.0 + ((frame.shadow_offset_x as f64) * scale) as f64;
+                    let shadow_y = coord.1 + ((frame.shadow_offset_y as f64) * scale) as f64;
+                    let shadow_coeff = (10.0 * scale) as f64;
                     rectangle(
                         [0.0, 0.0, 0.0, 1.0],
                         [
-                            shadow_x-(shadow_coeff),
-                            shadow_y-(shadow_coeff),
-                            shadow_coeff*2.0,
-                            shadow_coeff*2.0
+                            shadow_x - (shadow_coeff),
+                            shadow_y - (shadow_coeff),
+                            shadow_coeff * 2.0,
+                            shadow_coeff * 2.0,
                         ],
                         context.transform,
-                        graphic
+                        graphic,
                     );
                 };
-                self.draw_meta_frame_group(graphic, context, frame.frame_id as usize, &(coord_x, coord_y), scale);
-            },
+                self.draw_meta_frame_group(
+                    graphic,
+                    context,
+                    frame.frame_id as usize,
+                    &(coord_x, coord_y),
+                    scale,
+                );
+            }
         };
     }
 
@@ -308,7 +391,8 @@ impl WanSprite {
         };
         let mut frame_number = 0;
         for actual_frame_id in 0..self.animations.animations[animation_id].len() {
-            frame_number += self.animations.animations[animation_id].frames[actual_frame_id].duration as usize;
+            frame_number +=
+                self.animations.animations[animation_id].frames[actual_frame_id].duration as usize;
         }
         frame_number
     }

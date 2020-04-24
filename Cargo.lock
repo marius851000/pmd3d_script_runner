@@ -619,6 +619,10 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "d3b7357d2bbc5ee92f8e899ab645233e43d21407573cceb37fed8bc3dede2c02"
 
 [[package]]
+name = "io_partition"
+version = "1.0.0"
+
+[[package]]
 name = "itoa"
 version = "0.4.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1094,12 +1098,19 @@ name = "pmd3d_script_runner"
 version = "0.1.0"
 dependencies = [
  "image 0.23.2",
- "ndsrom",
- "opendungeon-rom-cpack",
+ "opendungeon-common",
  "opendungeon-rom-pkdpx",
  "opendungeon-rom-wan",
  "piston_window",
+ "pmd_cpack",
  "rlua",
+]
+
+[[package]]
+name = "pmd_cpack"
+version = "1.0.0"
+dependencies = [
+ "io_partition",
 ]
 
 [[package]]

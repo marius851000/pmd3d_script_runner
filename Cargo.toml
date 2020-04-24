@@ -11,7 +11,8 @@ rlua = "0.17.0"
 piston_window = "0.107.0"
 #NOTE: need to clean up. mysterydungeongeneration folder is actually from opendungeon (can be found on framagit)
 opendungeon-rom-wan = {path = "../../../programming project/mysterydungeongeneration/gamedata/rom/wan"}
-opendungeon-rom-cpack = {path = "../../../programming project/mysterydungeongeneration/gamedata/rom/cpack"}
+#Soon to be published on crates.io
+pmd_cpack = {path = "../../../programming project/pmd_cpack"}
 opendungeon-rom-pkdpx = {path = "../../../programming project/mysterydungeongeneration/gamedata/rom/pkdpx"}
-ndsrom = { path = "../../../programming project/mysterydungeongeneration/gamedata/rom/ndsrom"}
+opendungeon-common = {path = "../../../programming project/mysterydungeongeneration/common"}
 image = "0.23.2"
