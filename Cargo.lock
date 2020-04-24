@@ -1099,10 +1099,10 @@ version = "0.1.0"
 dependencies = [
  "image 0.23.2",
  "opendungeon-common",
- "opendungeon-rom-pkdpx",
  "opendungeon-rom-wan",
  "piston_window",
  "pmd_cpack",
+ "pmd_pkdpx",
  "rlua",
 ]
 
@@ -1111,6 +1111,14 @@ name = "pmd_cpack"
 version = "1.0.0"
 dependencies = [
  "io_partition",
+]
+
+[[package]]
+name = "pmd_pkdpx"
+version = "0.1.0"
+dependencies = [
+ "io_partition",
+ "log",
 ]
 
 [[package]]

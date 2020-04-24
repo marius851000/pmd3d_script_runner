@@ -13,6 +13,7 @@ piston_window = "0.107.0"
 opendungeon-rom-wan = {path = "../../../programming project/mysterydungeongeneration/gamedata/rom/wan"}
 #Soon to be published on crates.io
 pmd_cpack = {path = "../../../programming project/pmd_cpack"}
-opendungeon-rom-pkdpx = {path = "../../../programming project/mysterydungeongeneration/gamedata/rom/pkdpx"}
+#idem
+pmd_pkdpx = {path = "../../../programming project/pmd_pkdpx"}
 opendungeon-common = {path = "../../../programming project/mysterydungeongeneration/common"}
 image = "0.23.2"
