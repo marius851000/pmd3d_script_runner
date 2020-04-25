@@ -5,7 +5,6 @@ use crate::render::CharacterSprite;
 use crate::render::WanStore;
 use crate::Input;
 use crate::Logic;
-use opendungeon_common::Bytes;
 use piston_window::*;
 use pmd_cpack::CPack;
 use std::collections::HashMap;

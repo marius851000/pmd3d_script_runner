@@ -9,11 +9,8 @@ edition = "2018"
 [dependencies]
 rlua = "0.17.0"
 piston_window = "0.107.0"
-#NOTE: need to clean up. mysterydungeongeneration folder is actually from opendungeon (can be found on framagit)
-opendungeon-rom-wan = {path = "../../../programming project/mysterydungeongeneration/gamedata/rom/wan"}
 #Soon to be published on crates.io
 pmd_cpack = {path = "../../../programming project/pmd_cpack"}
-#idem
+pmd_wan = {path = "../../../programming project/pmd_wan"}
 pmd_pkdpx = {path = "../../../programming project/pmd_pkdpx"}
-opendungeon-common = {path = "../../../programming project/mysterydungeongeneration/common"}
 image = "0.23.2"

@@ -1,10 +1,10 @@
 extern crate piston_window;
 use crate::render::{PreLoad, PreLoadState};
 use ::image::ImageBuffer;
-use opendungeon_common::Bytes;
 use pmd_pkdpx::{decompress_px, is_px};
-use opendungeon_rom_wan::wan::{AnimStore, MetaFrameStore};
-use opendungeon_rom_wan::WanImage as WanImg;
+use pmd_wan::wan::{AnimStore, MetaFrameStore};
+use pmd_wan::WanImage as WanImg;
+use std::io::Cursor;
 use piston_window::*;
 use pmd_cpack::CPack;
 use std::io::{Read, Seek};
@@ -41,15 +41,13 @@ impl<F: 'static + Read + Seek + Send> WanStore<F> {
         let handle = thread::spawn(move || {
             let mut file = pack.get_file(sprite_id).unwrap();
             if is_px(&mut file).unwrap() {
-                WanImg::new_from_bytes(
-                    Bytes::new_from_vec(
+                WanImg::new(
+                    Cursor::new(
                         decompress_px(file).unwrap()
                     )
                 ).unwrap()
             } else {
-                WanImg::new_from_bytes(
-                    Bytes::new_from_io(file).unwrap()
-                ).unwrap()
+                WanImg::new(file).unwrap()
             }
         });
         self.sprites[sprite_id].set_status_loading(handle);
