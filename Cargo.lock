@@ -545,6 +545,8 @@ checksum = "d3b7357d2bbc5ee92f8e899ab645233e43d21407573cceb37fed8bc3dede2c02"
 [[package]]
 name = "io_partition"
 version = "1.0.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "560ec9fc1b499d0abb583ffd8bec96ce214bb3503260441c725b3aa40a63a56a"
 
 [[package]]
 name = "jpeg-decoder"
@@ -967,13 +969,17 @@ dependencies = [
 [[package]]
 name = "pmd_cpack"
 version = "1.0.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "f421943c588946a46875edacb52758d33f3d7aa77898c14da11dcb0871ad355c"
 dependencies = [
  "io_partition",
 ]
 
 [[package]]
 name = "pmd_pkdpx"
-version = "0.1.0"
+version = "1.0.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "dca91b90587b924b52a1c8fafcfef1d9fbe314cc2af467f37650912c383aa654"
 dependencies = [
  "io_partition",
  "log",
@@ -981,7 +987,9 @@ dependencies = [
 
 [[package]]
 name = "pmd_wan"
-version = "0.1.0"
+version = "1.0.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "e19e18e4346fdae0387318daaf9f467d2e20f55069a2146052f234eb24dbd341"
 dependencies = [
  "image 0.22.5",
  "log",
