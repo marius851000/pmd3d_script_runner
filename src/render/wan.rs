@@ -128,18 +128,6 @@ impl WanHandler {
         };
     }
 
-    pub fn draw_next_frame(
-        &mut self,
-        graphic: &mut G2d,
-        context: &Context,
-        coord: &(f64, f64),
-        scale: f64,
-    ) -> () {
-        //TODO: use the real time between two call to this function
-        self.draw_frame(graphic, context, coord, scale);
-        self.next_frame();
-    }
-
     pub fn draw_frame(
         &self,
         graphic: &mut G2d,
@@ -176,6 +164,7 @@ impl WanHandler {
         }
     }
 
+    #[allow(dead_code)]
     pub fn is_finished(&self) -> bool {
         if self.looped_at_least_1 {
             true
@@ -184,6 +173,7 @@ impl WanHandler {
         }
     }
 
+    #[allow(dead_code)]
     pub fn len_animations(&self) -> usize {
         self.sprite.len_animations()
     }
@@ -197,7 +187,7 @@ pub struct WanImage {
 
 impl WanImage {
     fn new(
-        mut data: Vec<u8>,
+        data: Vec<u8>,
         width: u32,
         height: u32,
         texture_context: &mut G2dTextureContext,
@@ -213,6 +203,7 @@ impl WanImage {
             height: height as f32,
         }
     }
+
     fn draw(
         &self,
         graphic: &mut G2d,
@@ -401,6 +392,7 @@ impl WanSprite {
         frame_number
     }
 
+    #[allow(dead_code)]
     pub fn len_meta_frame_group(&self) -> usize {
         self.meta_frames.meta_frame_groups.len()
     }

@@ -6,6 +6,7 @@ use std::thread;
 pub enum PreLoadState {
     NotLoading,
     Loading,
+    #[allow(dead_code)]
     Failed,
     Loaded,
 }

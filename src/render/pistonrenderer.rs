@@ -9,7 +9,6 @@ use piston_window::*;
 use pmd_cpack::CPack;
 use std::collections::HashMap;
 use std::fs::File;
-use std::path::Path;
 use std::path::PathBuf;
 
 pub struct PistonRenderer {
@@ -49,7 +48,6 @@ impl PistonRenderer {
 
         // What does a position unit represent in pixel ? (float)
         let scale = 100.0;
-        let scale_div2 = scale / 2.0;
         let mut camera = Camera::new(scale, (0.0, 0.0), 0.0);
         while let Some(e) = self.window.next() {
             if let Event::Loop(Loop::Update(update_arg)) = e {

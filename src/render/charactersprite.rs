@@ -28,6 +28,7 @@ impl CharacterSprite {
         result
     }
 
+    #[allow(dead_code)]
     pub fn set_shadow(&mut self, shadow_enabled: bool) {
         self.handler.with_shadow = shadow_enabled;
     }
