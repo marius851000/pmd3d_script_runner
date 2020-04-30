@@ -1,5 +1,8 @@
 #![feature(drain_filter)]
 
+#[macro_use]
+extern crate log;
+
 mod lua;
 pub use lua::{add_locking_function, LockReason, RunningLua, YieldResult};
 

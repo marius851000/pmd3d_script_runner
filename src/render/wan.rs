@@ -1,12 +1,12 @@
 extern crate piston_window;
 use crate::render::{PreLoad, PreLoadState};
 use ::image::ImageBuffer;
+use piston_window::*;
+use pmd_cpack::CPack;
 use pmd_pkdpx::{decompress_px, is_px};
 use pmd_wan::wan::{AnimStore, MetaFrameStore};
 use pmd_wan::WanImage as WanImg;
 use std::io::Cursor;
-use piston_window::*;
-use pmd_cpack::CPack;
 use std::io::{Read, Seek};
 use std::thread;
 use std::{rc::Rc, sync::Arc};
@@ -41,11 +41,7 @@ impl<F: 'static + Read + Seek + Send> WanStore<F> {
         let handle = thread::spawn(move || {
             let mut file = pack.get_file(sprite_id).unwrap();
             if is_px(&mut file).unwrap() {
-                WanImg::new(
-                    Cursor::new(
-                        decompress_px(file).unwrap()
-                    )
-                ).unwrap()
+                WanImg::new(Cursor::new(decompress_px(file).unwrap())).unwrap()
             } else {
                 WanImg::new(file).unwrap()
             }

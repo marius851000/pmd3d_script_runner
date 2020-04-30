@@ -1,4 +1,4 @@
-use crate::gamedata::{Color, Lock, Speed, Time, Vec2_f64, Vec3_f64};
+use crate::gamedata::{Color, Lock, Portrait, Speed, Time, Vec2_f64, Vec3_f64};
 
 /// This enum store everything that can update the scene
 #[derive(Debug, Clone)]
@@ -21,4 +21,8 @@ pub enum Update {
     TransitionScreenColor(u16, Time, Color),
     /// The pokemeon finished everything, can start the IDLE animation
     StartIDLE(String),
+    /// Display a face on the screen
+    SetPortrait(Portrait),
+    /// Remove the displayed face
+    RemovePortrait,
 }

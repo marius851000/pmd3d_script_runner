@@ -1,3 +1,4 @@
+//TODO: may need change. Create a full fledged lua parser (a library may already exist)
 pub fn transform_script(script: &str) -> String {
     let lines: String = script
         .lines()
@@ -73,7 +74,17 @@ pub fn transform_script(script: &str) -> String {
             if arguments == "" {
                 everytime_before + &object + ":" + &function_name
             } else {
-                everytime_before + "OBJECT_" + &function_name + "(" + &object + ", " + &arguments
+                everytime_before
+                    + "OBJECT_"
+                    + &function_name
+                    + "("
+                    + &object
+                    + if arguments.chars().nth(0).unwrap() != ')' {
+                        ", "
+                    } else {
+                        ""
+                    }
+                    + &arguments
             }
         })
         .map(|line| line + "\n")

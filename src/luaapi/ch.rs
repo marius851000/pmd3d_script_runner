@@ -12,6 +12,7 @@ impl CH {
         CH { scene, id }
     }
 }
+
 impl UserData for CH {
     fn add_methods<'lua, M: UserDataMethods<'lua, Self>>(methods: &mut M) {
         methods.add_method("SetPosition", |_, this, position: Vec3_f64| {

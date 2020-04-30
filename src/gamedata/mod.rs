@@ -26,3 +26,9 @@ pub use screen::Screen;
 
 mod speed;
 pub use speed::Speed;
+
+mod facetype;
+pub use facetype::FaceType;
+
+mod portrait;
+pub use portrait::Portrait;

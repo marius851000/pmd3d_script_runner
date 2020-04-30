@@ -1,4 +1,4 @@
-use crate::gamedata::{Chara, Lock, Screen, Update};
+use crate::gamedata::{Chara, Lock, Portrait, Screen, Update};
 use std::collections::HashMap;
 use std::mem::swap;
 use std::sync::atomic::Ordering::Relaxed;
@@ -9,6 +9,7 @@ pub struct Scene {
     updates: Vec<Update>,
     locks: Vec<Lock>,
     pub screens: Vec<Screen>, //Screen 0: upper, Screen 1: down
+    pub portrait: Option<Portrait>,
 }
 
 impl Default for Scene {
@@ -18,6 +19,7 @@ impl Default for Scene {
             updates: Vec::new(),
             locks: Vec::new(),
             screens: vec![Screen::new(), Screen::new()],
+            portrait: None,
         }
     }
 }
@@ -83,6 +85,14 @@ impl Scene {
                 [*screen_id as usize]
                 .set_color_transition(duration.clone(), color.clone()),
             Update::StartIDLE(_) => (),
+            Update::SetPortrait(portrait) => self.portrait = Some(portrait.clone()),
+            Update::RemovePortrait => self.portrait = None,
+        };
+        if log_enabled!(log::Level::Debug) {
+            match update {
+                Update::TimeSpent(_) => (),
+                _ => debug!("{:?}", update),
+            };
         };
         self.updates.push(update);
     }

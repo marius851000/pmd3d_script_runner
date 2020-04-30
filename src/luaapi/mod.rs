@@ -12,3 +12,9 @@ pub use task::TASK;
 
 mod screen;
 pub use screen::SCREEN;
+
+mod window;
+pub use window::WINDOW;
+
+mod symact;
+pub use symact::SymAct;
