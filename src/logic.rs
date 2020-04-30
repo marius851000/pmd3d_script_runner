@@ -5,6 +5,8 @@ use crate::Input;
 use crate::RunningLua;
 use std::sync::{Arc, Mutex};
 
+/// Store everything related to the logic of this library, cf not related to rendering.
+/// This include scene data, and lua execution
 #[derive(Debug)]
 pub struct Logic {
     lua: RunningLua,
@@ -12,6 +14,7 @@ pub struct Logic {
 }
 
 impl Logic {
+    /// Create a new `Logic` struct, that will execute the lua script inputed
     pub fn new(script: &str) -> Self {
         let mut lua = RunningLua::default();
         let scene = Arc::new(Mutex::new(Scene::default()));
@@ -20,6 +23,7 @@ impl Logic {
         Logic { lua, scene }
     }
 
+    /// Execute the lua code until it need to wait for further stuff. You are supposed to call this function once a frame
     pub fn execute(&mut self, input: Input) {
         {
             let mut lock = self.scene.lock().unwrap();
@@ -28,6 +32,7 @@ impl Logic {
         self.lua.execute()
     }
 
+    /// Return the list of `Update` from the last execution. Also empty it, so don't call it two time consecutively.
     pub fn get_and_clear_updates(&mut self) -> Vec<Update> {
         let mut lock = self.scene.lock().unwrap();
         lock.get_and_clear_updates()
