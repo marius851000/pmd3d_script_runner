@@ -65,8 +65,7 @@ impl Scene {
                         } else {
                             false
                         }
-                    }
-                    #[allow(unreachable_patterns)]
+                    },
                     _ => false,
                 });
                 for screen in &mut self.screens {
@@ -75,6 +74,18 @@ impl Scene {
                 for (charid, chara) in self.charas.iter_mut() {
                     if chara.time_spent(*time) {
                         self.updates.push(Update::StartIDLE(charid.clone()));
+                        self.locks.drain_filter(|lock| match lock {
+                            Lock::WaitMove(lock, lock_charid) => {
+                                if charid == lock_charid {
+                                    lock.store(true, Relaxed);
+                                    true
+                                } else {
+                                    false
+                                }
+                            },
+                            _ => false
+                        });
+                        ()
                     };
                 }
             }
@@ -91,26 +102,15 @@ impl Scene {
         if log_enabled!(log::Level::Debug) {
             match update {
                 Update::TimeSpent(_) => (),
-                _ => debug!("{:?}", update),
+                _ => {
+                    debug!("new update: {:?}", update);
+                    trace!("list of locks: {:?}", self.locks);
+                },
             };
         };
         self.updates.push(update);
     }
-
-    pub fn check_lock(&mut self) {
-        let mut finished = Vec::new();
-        for (id, lock) in self.locks.iter().enumerate() {
-            if lock.is_finished(&self) {
-                finished.push(id)
-            }
-        }
-
-        for (difference, original_id) in finished.iter().enumerate() {
-            let true_id = original_id - difference;
-            self.locks[true_id].unlock();
-        }
-    }
-
+    
     pub fn get_and_clear_updates(&mut self) -> Vec<Update> {
         let mut replace = Vec::new();
         swap(&mut self.updates, &mut replace);

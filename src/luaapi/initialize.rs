@@ -133,5 +133,6 @@ pub fn initialize_lua_environment(lua: &RunningLua, scene: &Arc<Mutex<Scene>>) {
         add_non_blocking_method(&ctx, "RemoveFace", 0);
         add_blocking_method(&ctx, "Sleep", 1);
         add_blocking_method(&ctx, "FadeOut", 2);
+        add_blocking_method(&ctx, "WaitMove", 0);
     })
 }

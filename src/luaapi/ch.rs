@@ -1,6 +1,8 @@
-use crate::gamedata::{Scene, Speed, Update, Vec2_f64, Vec3_f64};
+use crate::gamedata::{Scene, Speed, Update, Vec2_f64, Vec3_f64, Lock};
+use crate::LockReason;
+use crate::YieldResult;
 use rlua::{UserData, UserDataMethods};
-use std::sync::{Arc, Mutex};
+use std::sync::{atomic::AtomicBool, Arc, Mutex};
 
 pub struct CH {
     scene: Arc<Mutex<Scene>>,
@@ -24,6 +26,12 @@ impl UserData for CH {
             let mut scene = this.scene.lock().unwrap();
             scene.update(Update::WalkTo(this.id.clone(), position, speed));
             Ok(())
-        })
+        });
+        methods.add_method("_WaitMove", |_, this, (): ()| {
+            let mut scene = this.scene.lock().unwrap();
+            let abool = Arc::new(AtomicBool::new(false));
+            scene.update(Update::AddLock(Lock::WaitMove(abool.clone(), this.id.clone())));
+            Ok(YieldResult::new(LockReason::new_abool(abool)))
+        });
     }
 }
