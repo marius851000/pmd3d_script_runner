@@ -43,13 +43,15 @@ pub fn initialize_lua_environment(lua: &RunningLua, scene: &Arc<Mutex<Scene>>) {
         }
         arguments_part.pop();
         arguments_part.pop();
+        let code_to_load = &format!(
+            "function(this{}{})
+                coroutine.yield(this:_{}({}))
+            end",
+            if argument_number == 0 {""} else {", "}, arguments_part, method_name, arguments_part
+        );
+        println!("{}", code_to_load);
         let function: rlua::Function = ctx
-            .load(&format!(
-                "function(this, {})
-            coroutine.yield(this:_{}({}))
-        end",
-                arguments_part, method_name, arguments_part
-            ))
+            .load(code_to_load)
             .eval()
             .unwrap();
         let globals = ctx.globals();
