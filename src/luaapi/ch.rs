@@ -1,4 +1,4 @@
-use crate::gamedata::{Scene, Speed, Update, Vec2_f64, Vec3_f64, Lock};
+use crate::gamedata::{Lock, Scene, Speed, Update, Vec2_f64, Vec3_f64};
 use crate::LockReason;
 use crate::YieldResult;
 use rlua::{UserData, UserDataMethods};
@@ -30,7 +30,10 @@ impl UserData for CH {
         methods.add_method("_WaitMove", |_, this, (): ()| {
             let mut scene = this.scene.lock().unwrap();
             let abool = Arc::new(AtomicBool::new(false));
-            scene.update(Update::AddLock(Lock::WaitMove(abool.clone(), this.id.clone())));
+            scene.update(Update::AddLock(Lock::WaitMove(
+                abool.clone(),
+                this.id.clone(),
+            )));
             Ok(YieldResult::new(LockReason::new_abool(abool)))
         });
     }

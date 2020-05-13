@@ -65,7 +65,7 @@ impl Scene {
                         } else {
                             false
                         }
-                    },
+                    }
                     _ => false,
                 });
                 for screen in &mut self.screens {
@@ -82,8 +82,8 @@ impl Scene {
                                 } else {
                                     false
                                 }
-                            },
-                            _ => false
+                            }
+                            _ => false,
                         });
                         ()
                     };
@@ -105,12 +105,12 @@ impl Scene {
                 _ => {
                     debug!("new update: {:?}", update);
                     trace!("list of locks: {:?}", self.locks);
-                },
+                }
             };
         };
         self.updates.push(update);
     }
-    
+
     pub fn get_and_clear_updates(&mut self) -> Vec<Update> {
         let mut replace = Vec::new();
         swap(&mut self.updates, &mut replace);
