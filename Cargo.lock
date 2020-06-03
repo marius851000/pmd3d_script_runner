@@ -1021,9 +1021,9 @@ dependencies = [
 
 [[package]]
 name = "pmd_pkdpx"
-version = "1.0.0"
+version = "1.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "dca91b90587b924b52a1c8fafcfef1d9fbe314cc2af467f37650912c383aa654"
+checksum = "759cc05797b1e48467b143c5a897ff99cfe5b9a8f2f7613f50c08bd0a242f568"
 dependencies = [
  "io_partition",
  "log",

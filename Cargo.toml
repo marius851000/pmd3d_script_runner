@@ -12,7 +12,7 @@ piston_window = "0.107.0"
 #Soon to be published on crates.io
 pmd_cpack = "1.0.0"
 pmd_wan = "1.0.0"
-pmd_pkdpx = "1.0.0"
+pmd_pkdpx = "1.1.0"
 image = "0.23.2"
 log = "0.4"
 env_logger = "0.7.1"
