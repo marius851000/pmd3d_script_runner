@@ -1,7 +1,7 @@
-use rlua::UserData;
+use mlua::{FromLua, UserData};
 use std::ops::{Add, Div, Mul, Sub};
 
-#[derive(Copy, Clone, Debug, PartialEq, Default)]
+#[derive(Copy, Clone, Debug, PartialEq, Default, FromLua)]
 #[allow(non_camel_case_types)]
 pub struct Vec3_f64 {
     pub x: f64,
@@ -78,7 +78,7 @@ fn test_vec3_math() {
     assert_eq!(vec1 * vec2, Vec3_f64::new(0.5 * 1.0, 1.0 * 0.5, 2.0 * 2.0));
 }
 
-#[derive(Copy, Clone, Debug, PartialEq, Default)]
+#[derive(Copy, Clone, Debug, PartialEq, Default, FromLua)]
 #[allow(non_camel_case_types)]
 pub struct Vec2_f64 {
     pub x: f64,

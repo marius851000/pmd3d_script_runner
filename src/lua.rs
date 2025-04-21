@@ -1,6 +1,6 @@
 //! This file contain everything required to make cooperative multiprocessing lua reader implementation
 #![allow(clippy::trivially_copy_pass_by_ref)]
-use rlua::{Context, Function, Lua, Nil, Table, Thread, ThreadStatus, UserData};
+use mlua::{FromLua, Function, Lua, Nil, Table, Thread, ThreadStatus, UserData};
 use std::collections::HashMap;
 use std::sync::{
     atomic::{AtomicBool, Ordering::Relaxed},
@@ -32,7 +32,7 @@ impl LockReason {
     }
 }
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, FromLua)]
 /// A struct that should be returned when a ``Thread`` is not finished, but want to interupt it's instruction until another event happend
 pub struct YieldResult {
     lock: LockReason,
@@ -54,13 +54,13 @@ struct LuaRunningData {
 }
 
 impl LuaRunningData {
-    fn add_running_thread<'lua>(&mut self, ctx: &Context<'lua>, thread: Thread<'lua>) {
+    fn add_running_thread<'lua>(&mut self, ctx: &Lua, thread: Thread) {
         let globals = ctx.globals();
 
         let created_task_id = self.next_task_id;
         self.next_task_id += 1;
 
-        let running_table = globals.get::<_, Table>("_yammy_running_coroutine").unwrap();
+        let running_table = globals.get::<Table>("_yammy_running_coroutine").unwrap();
         running_table.set(created_task_id, thread).unwrap();
         globals
             .set("_yammy_running_coroutine", running_table)
@@ -122,37 +122,35 @@ impl RunningLua {
     }
 
     pub fn load_script(&mut self, script: &str) {
-        self.lua.context(|ctx| {
-            let main_thread = ctx
-                .create_thread(ctx.load(script).into_function().unwrap())
-                .unwrap();
-            {
-                let mut data = self.running_data.lock().unwrap();
-                data.add_running_thread(&ctx, main_thread);
-            }
-        })
+        let main_thread = self
+            .lua
+            .create_thread(self.lua.load(script).into_function().unwrap())
+            .unwrap();
+        {
+            let mut data = self.running_data.lock().unwrap();
+            data.add_running_thread(&self.lua, main_thread);
+        }
     }
 
     fn env_setup(&mut self) {
-        self.lua.context(|ctx| {
-            let globals = ctx.globals();
-            globals
-                .set("_yammy_running_coroutine", ctx.create_table().unwrap())
-                .unwrap();
+        let globals = self.lua.globals();
+        globals
+            .set("_yammy_running_coroutine", self.lua.create_table().unwrap())
+            .unwrap();
 
-            let running_data_cloned = self.running_data.clone();
-            let yammy_fork = ctx
-                .create_function(move |ctx, function: Function| {
-                    let thread = ctx.create_thread(function).unwrap();
-                    {
-                        let mut data = running_data_cloned.lock().unwrap();
-                        data.add_running_thread(&ctx, thread);
-                    }
-                    Ok(())
-                })
-                .unwrap();
-            globals.set("yammy_fork", yammy_fork).unwrap();
-        })
+        let running_data_cloned = self.running_data.clone();
+        let yammy_fork = self
+            .lua
+            .create_function(move |ctx, function: Function| {
+                let thread = ctx.create_thread(function).unwrap();
+                {
+                    let mut data = running_data_cloned.lock().unwrap();
+                    data.add_running_thread(&ctx, thread);
+                }
+                Ok(())
+            })
+            .unwrap();
+        globals.set("yammy_fork", yammy_fork).unwrap();
     }
 
     fn step(&mut self) -> bool {
@@ -171,50 +169,45 @@ impl RunningLua {
     }
 
     fn continue_running_thread(&mut self, id: u64) {
-        self.lua.context(|ctx| {
-            let globals = ctx.globals();
-            let running_coroutine_table =
-                globals.get::<_, Table>("_yammy_running_coroutine").unwrap();
-            let thread = running_coroutine_table.get::<_, Thread>(id).unwrap();
-            let result = thread.resume::<(), Option<YieldResult>>(()).unwrap();
-            // check if the thread is finished
-            let mut data = self.running_data.lock().unwrap();
-            match thread.status() {
-                ThreadStatus::Resumable => match result {
-                    None => panic!(),
-                    Some(value) => {
-                        data.set_running_thread_lock(id, value.lock);
-                    }
-                }, // The function that yielded managed the state of this
-                ThreadStatus::Unresumable => {
-                    data.delete_running_thread(id);
-                    running_coroutine_table.set(id, Nil).unwrap();
-                    globals
-                        .set("_yammy_running_coroutine", running_coroutine_table)
-                        .unwrap();
+        let globals = self.lua.globals();
+        let running_coroutine_table = globals.get::<Table>("_yammy_running_coroutine").unwrap();
+        let thread = running_coroutine_table.get::<Thread>(id).unwrap();
+        let result = thread.resume::<Option<YieldResult>>(()).unwrap();
+        // check if the thread is finished
+        let mut data = self.running_data.lock().unwrap();
+        match thread.status() {
+            ThreadStatus::Resumable => match result {
+                None => panic!(),
+                Some(value) => {
+                    data.set_running_thread_lock(id, value.lock);
                 }
-                ThreadStatus::Error => panic!(),
+            }, // The function that yielded managed the state of this
+            ThreadStatus::Running => (),
+            ThreadStatus::Finished => {
+                data.delete_running_thread(id);
+                running_coroutine_table.set(id, Nil).unwrap();
+                globals
+                    .set("_yammy_running_coroutine", running_coroutine_table)
+                    .unwrap();
             }
-        });
+            ThreadStatus::Error => panic!(),
+        }
     }
 
     pub fn execute(&mut self) {
         while self.step() {}
     }
 
-    pub fn context<F, R>(&self, f: F) -> R
-    where
-        F: FnOnce(Context) -> R,
-    {
-        self.lua.context(f)
+    pub fn lua(&self) -> &Lua {
+        &self.lua
     }
 }
 
 pub fn add_locking_function<'lua>(
-    ctx: &Context<'lua>,
+    ctx: &Lua,
     front_user_function_name: &str,
     internal_function_name: &str,
-    internal_function: Function<'lua>,
+    internal_function: Function,
 ) {
     let globals = ctx.globals();
     globals
@@ -238,10 +231,8 @@ mod test {
         use crate::RunningLua;
         let mut runninglua = RunningLua::new_from_script("a = 3");
         runninglua.execute();
-        runninglua.context(|ctx| {
-            let globals = ctx.globals();
-            assert_eq!(globals.get::<_, u64>("a").unwrap(), 3);
-        })
+        let globals = runninglua.lua().globals();
+        assert_eq!(globals.get::<u64>("a").unwrap(), 3);
     }
     #[test]
     fn test_lock() {
@@ -252,23 +243,22 @@ mod test {
         };
         let mut runninglua = RunningLua::default();
         let pass_value = Arc::new(AtomicBool::new(false));
-        runninglua.context(|ctx| {
-            let pass_value_cloned = pass_value.clone();
-            let _yammy_test_lock_internal = ctx
-                .create_function(move |_, ()| {
-                    Ok(YieldResult::new(LockReason::WaitAtomicBool(
-                        pass_value_cloned.clone(),
-                    )))
-                })
-                .unwrap();
+        let pass_value_cloned = pass_value.clone();
+        let _yammy_test_lock_internal = runninglua
+            .lua()
+            .create_function(move |_, ()| {
+                Ok(YieldResult::new(LockReason::WaitAtomicBool(
+                    pass_value_cloned.clone(),
+                )))
+            })
+            .unwrap();
 
-            add_locking_function(
-                &ctx,
-                "yammy_test_lock",
-                "_yammy_test_lock_internal",
-                _yammy_test_lock_internal,
-            );
-        });
+        add_locking_function(
+            runninglua.lua(),
+            "yammy_test_lock",
+            "_yammy_test_lock_internal",
+            _yammy_test_lock_internal,
+        );
 
         runninglua.load_script(
             "
@@ -287,10 +277,10 @@ mod test {
             runninglua.execute();
         }
 
-        runninglua.context(|ctx| {
-            let globals = ctx.globals();
-            assert_eq!(globals.get::<_, u64>("a").unwrap(), 1);
-        });
+        {
+            let globals = runninglua.lua().globals();
+            assert_eq!(globals.get::<u64>("a").unwrap(), 1);
+        }
 
         pass_value.store(true, Relaxed);
 
@@ -298,9 +288,7 @@ mod test {
             runninglua.execute();
         }
 
-        runninglua.context(|ctx| {
-            let globals = ctx.globals();
-            assert_eq!(globals.get::<_, u64>("a").unwrap(), 3);
-        });
+        let globals = runninglua.lua().globals();
+        assert_eq!(globals.get::<u64>("a").unwrap(), 3);
     }
 }

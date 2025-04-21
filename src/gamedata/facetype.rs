@@ -1,6 +1,6 @@
-use rlua::UserData;
+use mlua::{FromLua, UserData};
 
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, FromLua)]
 pub enum FaceType {
     NORMAL,
 }

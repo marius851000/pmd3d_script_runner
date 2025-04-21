@@ -1,6 +1,6 @@
 use crate::gamedata::{FaceType, Portrait, Scene, Update};
 use crate::luaapi::SymAct;
-use rlua::{UserData, UserDataMethods};
+use mlua::{UserData, UserDataMethods};
 use std::sync::{Arc, Mutex};
 
 pub struct WINDOW {
@@ -14,7 +14,7 @@ impl WINDOW {
 }
 
 impl UserData for WINDOW {
-    fn add_methods<'lua, M: UserDataMethods<'lua, Self>>(methods: &mut M) {
+    fn add_methods<M: UserDataMethods<Self>>(methods: &mut M) {
         methods.add_method(
             "DrawFace",
             |_, this, (x, y, actor, facetype): (f64, f64, SymAct, FaceType)| {

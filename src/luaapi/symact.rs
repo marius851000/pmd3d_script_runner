@@ -1,8 +1,8 @@
 use crate::gamedata::Scene;
-use rlua::UserData;
+use mlua::{FromLua, UserData};
 use std::sync::{Arc, Mutex};
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, FromLua)]
 pub struct SymAct {
     scene: Arc<Mutex<Scene>>,
     pub id: String,

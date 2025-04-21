@@ -1,7 +1,7 @@
 use crate::gamedata::{Lock, Scene, Speed, Update, Vec2_f64, Vec3_f64};
 use crate::LockReason;
 use crate::YieldResult;
-use rlua::{UserData, UserDataMethods};
+use mlua::{UserData, UserDataMethods};
 use std::sync::{atomic::AtomicBool, Arc, Mutex};
 
 pub struct CH {
@@ -16,7 +16,7 @@ impl CH {
 }
 
 impl UserData for CH {
-    fn add_methods<'lua, M: UserDataMethods<'lua, Self>>(methods: &mut M) {
+    fn add_methods<M: UserDataMethods<Self>>(methods: &mut M) {
         methods.add_method("SetPosition", |_, this, position: Vec3_f64| {
             let mut scene = this.scene.lock().unwrap();
             scene.update(Update::SetPosition(this.id.clone(), position));

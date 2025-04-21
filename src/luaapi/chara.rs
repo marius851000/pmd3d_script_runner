@@ -1,5 +1,5 @@
 use crate::gamedata::{Scene, Update};
-use rlua::{UserData, UserDataMethods};
+use mlua::{UserData, UserDataMethods};
 use std::sync::{Arc, Mutex};
 
 pub struct CHARA {
@@ -13,7 +13,7 @@ impl CHARA {
 }
 
 impl UserData for CHARA {
-    fn add_methods<'lua, M: UserDataMethods<'lua, Self>>(methods: &mut M) {
+    fn add_methods<M: UserDataMethods<Self>>(methods: &mut M) {
         methods.add_method("DynamicLoad", |_, this, (id, specie): (String, String)| {
             let mut scene = this.scene.lock().unwrap();
             scene.update(Update::AddChara(id, specie));

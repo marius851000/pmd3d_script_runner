@@ -7,13 +7,12 @@ edition = "2018"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-rlua = "0.17.0"
-piston_window = "0.131.0"
-#Soon to be published on crates.io
+mlua = { version = "0.10.3", features = [ "lua51", "vendored", "macros" ] }
+piston_window = "0.132.0"
 pmd_cpack = "1.0.0"
-pmd_wan = "5.1.1"
+pmd_wan = "6.0.0"
 pmd_pkdpx = "1.1.0"
-image = "0.24.9"
+image = "0.25.6"
 log = "0.4"
-env_logger = "0.7.1"
+env_logger = "0.11.8"
 drain_filter_polyfill = "0.1.3"

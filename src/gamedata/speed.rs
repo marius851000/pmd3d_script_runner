@@ -1,7 +1,7 @@
-use rlua::UserData;
+use mlua::{FromLua, UserData};
 
 /// Store an ingame speed, in unit per second
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, FromLua)]
 pub struct Speed(pub f64);
 
 impl Speed {

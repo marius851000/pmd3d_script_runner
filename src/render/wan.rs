@@ -4,7 +4,7 @@ use ::image::{ImageBuffer, Rgba};
 use piston_window::*;
 use pmd_cpack::CPack;
 use pmd_pkdpx::{decompress_px, is_px};
-use pmd_wan::{AnimationStore, FragmentFlip, FragmentResolution, FrameStore, WanImage as WanImg};
+use pmd_wan::{AnimationStore, FragmentFlip, FrameStore, OamShape, WanImage as WanImg};
 use std::collections::HashMap;
 use std::io::Cursor;
 use std::io::{Read, Seek};
@@ -246,7 +246,7 @@ impl WanHostFragment {
 }
 
 pub struct WanSprite {
-    fragment_host: HashMap<(usize, (u8, u8)), WanHostFragment>,
+    fragment_host: HashMap<(usize, (u32, u32)), WanHostFragment>,
     frames: FrameStore,
     animations: AnimationStore,
 }
@@ -258,14 +258,18 @@ impl WanSprite {
             for fragment in &frame.fragments {
                 let key = (
                     fragment.fragment_bytes_index,
-                    (fragment.resolution.x, fragment.resolution.y),
+                    (fragment.resolution.size().x, fragment.resolution.size().y),
                 );
                 if !fragment_host.contains_key(&key) {
                     fragment_host.insert(
                         key,
                         WanHostFragment::new(
                             &wan.fragment_bytes_store.fragment_bytes[fragment.fragment_bytes_index]
-                                .get_image(&wan.palette, &fragment.resolution, fragment.pal_idx)
+                                .get_image(
+                                    &wan.palette,
+                                    fragment.resolution.size(),
+                                    fragment.pal_idx,
+                                )
                                 .unwrap(),
                             texture_context,
                         ),
@@ -286,13 +290,16 @@ impl WanSprite {
         graphic: &mut G2d,
         context: &Context,
         fragment_bytes_id: usize,
-        resolution: FragmentResolution,
+        resolution: OamShape,
         coord: &(f64, f64),
         scale: f64,
         flip: FragmentFlip,
     ) -> () {
         self.fragment_host
-            .get(&(fragment_bytes_id, (resolution.x, resolution.y)))
+            .get(&(
+                fragment_bytes_id,
+                (resolution.size().x, resolution.size().y),
+            ))
             .unwrap()
             .draw(graphic, context, coord, scale, flip);
     }

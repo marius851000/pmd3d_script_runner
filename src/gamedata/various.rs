@@ -1,9 +1,9 @@
-use rlua::UserData;
+use mlua::{FromLua, UserData};
 use std::cmp::Ordering;
 use std::ops::{AddAssign, SubAssign};
 
 /// time, in second
-#[derive(Debug, Clone, PartialEq, Copy)]
+#[derive(Debug, Clone, PartialEq, Copy, FromLua)]
 pub struct Time(pub f64);
 
 impl Time {
