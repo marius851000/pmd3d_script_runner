@@ -4,10 +4,7 @@ use ::image::{ImageBuffer, Rgba};
 use piston_window::*;
 use pmd_cpack::CPack;
 use pmd_pkdpx::{decompress_px, is_px};
-use pmd_wan::{
-    AnimationStore, FragmentFlip, FragmentResolution, FrameStore,
-    WanImage as WanImg,
-};
+use pmd_wan::{AnimationStore, FragmentFlip, FragmentResolution, FrameStore, WanImage as WanImg};
 use std::collections::HashMap;
 use std::io::Cursor;
 use std::io::{Read, Seek};
@@ -189,8 +186,10 @@ impl WanHostFragment {
         image: &ImageBuffer<Rgba<u8>, Vec<u8>>,
         texture_context: &mut G2dTextureContext,
     ) -> WanHostFragment {
-        let texture =
-            Texture::from_image(texture_context, image, &TextureSettings::new()).unwrap();
+        let mut settings = TextureSettings::new();
+        settings.set_filter(Filter::Nearest);
+
+        let texture = Texture::from_image(texture_context, image, &settings).unwrap();
 
         WanHostFragment {
             texture: texture,
