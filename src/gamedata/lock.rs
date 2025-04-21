@@ -1,8 +1,5 @@
-use crate::gamedata::{Scene, Time};
-use std::sync::{
-    atomic::{AtomicBool, Ordering::Relaxed},
-    Arc,
-};
+use crate::gamedata::Time;
+use std::sync::{atomic::AtomicBool, Arc};
 
 #[derive(Debug, Clone)]
 pub enum Lock {

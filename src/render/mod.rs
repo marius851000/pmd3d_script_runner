@@ -5,7 +5,7 @@ mod camera;
 pub use camera::Camera;
 
 mod wan;
-pub use wan::{WanHandler, WanImage, WanSprite, WanStore};
+pub use wan::{WanHandler, WanSprite, WanStore};
 
 mod preload;
 pub use preload::{PreLoad, PreLoadState};

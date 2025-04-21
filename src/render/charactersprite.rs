@@ -36,7 +36,7 @@ impl CharacterSprite {
     pub fn set_animation(&mut self, anim_id: usize, change_with_angle: bool) {
         self.change_with_angle = change_with_angle;
         self.anim_id = anim_id;
-        self.handler.start_animation(anim_id);
+        self.handler.start_animation(anim_id, 0);
     }
 
     pub fn draw(
@@ -55,8 +55,9 @@ impl CharacterSprite {
             } else {
                 anim_angle_change
             };
+
             self.handler
-                .transmute_animation(self.anim_id + anim_angle_change);
+                .transmute_animation(self.anim_id, anim_angle_change);
         };
         self.handler.draw_frame(graphic, context, coord, scale);
     }

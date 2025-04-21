@@ -56,14 +56,14 @@ impl PistonRenderer {
                     match update {
                         Update::AddChara(charid, actor) => {
                             let spriteid = match actor.as_str() {
-                                "KIBAGO" => 3,
+                                "KIBAGO" => 588,
                                 "TSUTAAJA" => 6,
                                 _ => 597,
                             };
                             let wan_sprite = image_store
                                 .get_sprite(&mut self.window.create_texture_context(), spriteid);
                             let mut spr = CharacterSprite::new_from_wan_sprite(wan_sprite);
-                            spr.set_animation(16, true);
+                            spr.set_animation(0, true);
                             characters_sprite.insert(charid, spr);
                         }
                         Update::DelChara(charid) => {
@@ -84,7 +84,7 @@ impl PistonRenderer {
                             characters_sprite
                                 .get_mut(&charid)
                                 .unwrap()
-                                .set_animation(16, true);
+                                .set_animation(0, true);
                         }
                         _ => (),
                     }

@@ -8,11 +8,12 @@ edition = "2018"
 
 [dependencies]
 rlua = "0.17.0"
-piston_window = "0.107.0"
+piston_window = "0.131.0"
 #Soon to be published on crates.io
 pmd_cpack = "1.0.0"
-pmd_wan = "1.0.0"
+pmd_wan = "5.1.1"
 pmd_pkdpx = "1.1.0"
-image = "0.23.2"
+image = "0.24.9"
 log = "0.4"
 env_logger = "0.7.1"
+drain_filter_polyfill = "0.1.3"

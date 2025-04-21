@@ -1,3 +1,5 @@
+use drain_filter_polyfill::VecExt;
+
 use crate::gamedata::{Chara, Lock, Portrait, Screen, Update};
 use std::collections::HashMap;
 use std::mem::swap;
